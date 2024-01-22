@@ -26,7 +26,7 @@
       }
     },
     "android": {
-      "jsEngine": "jsc",
+  
       "permissions": ["INTERNET", "ACCESS_BACKGROUND_LOCATION", "ACCESS_FINE_LOCATION"],
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
