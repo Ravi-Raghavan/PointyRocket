@@ -5,7 +5,7 @@ import redis
 
 #Flask Server Information
 app = Flask(__name__)
-CORS(app, origin = 'http://localhost:8000')
+CORS(app, origin = 'http://localhost:8000', resources={r"/*": {"origins": "*"}})
 
 #Redis Data Store Information
 r = redis.Redis(
@@ -19,6 +19,11 @@ if starting_index is not None:
     starting_index = int(starting_index)
 else:
     starting_index = 0
+    
+#Set up Default Home Page
+@app.route("/")
+def hello_world():
+    return "<p>Backend Flask Server</p>"
 
 #Receive Data from Front End
 @app.route("/submit_path", methods=['POST'])
