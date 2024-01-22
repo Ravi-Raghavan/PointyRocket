@@ -73,7 +73,7 @@ const GoogleMapComponent = ({ setMap,
             if (submit && polylinePath.length > 0) {
                 console.log('submitted');
 
-                const ipAddress = 'http://172.31.145.56:8000/submit_path';
+                const ipAddress = 'http://172.31.137.217:8000/submit_path';
                 const dataToSend = { path: polylinePath };
 
                 console.log('data that is sent', dataToSend);
