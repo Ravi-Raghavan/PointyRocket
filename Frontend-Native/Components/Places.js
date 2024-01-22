@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
-import PlacesAutocomplete from "expo-google-places-autocomplete";
 
 const GooglePlacesInput = ({ setSearchLocation }) => {
 
