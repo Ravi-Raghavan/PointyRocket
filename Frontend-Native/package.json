@@ -16,7 +16,6 @@
     "hermes-engine": "0.1.1",
     "react": "18.2.0",
     "react-native": "0.73.2",
-    "react-native-google-places-autocomplete": "^2.5.6",
     "react-native-maps": "1.8.0",
     "react-native-permissions": "^4.0.4"
   },

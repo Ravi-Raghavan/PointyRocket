@@ -39,9 +39,6 @@ export default function App() {
     <View style={styles.container}>
       <StatusBar style="light" translucent={true} />
 
-
-
-      
       <View style={styles.searchBox}>
 
         <View style={styles.header}>
@@ -52,12 +49,12 @@ export default function App() {
           />
         </View>
         
-        {/* <View style={{ marginHorizontal: 8 }}> */}
+        
           <GooglePlacesInput
 
             setSearchLocation={setSearchLocation}
-          />
-        {/* </View> */}
+          /> 
+        
       </View>
 
       <View style={styles.mapBox}>
@@ -80,7 +77,9 @@ export default function App() {
           setDrawPath={setDrawPath}
           setDeletePath={setDeletePath}
         />
-      </View>
+      </View> 
+      
+      
         
     </View>
   );
@@ -137,3 +136,5 @@ const styles = StyleSheet.create({
 
 
 });
+
+
