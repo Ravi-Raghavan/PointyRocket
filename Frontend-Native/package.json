@@ -9,7 +9,7 @@
     "web": "expo start --web"
   },
   "dependencies": {
-    "expo": "~50.0.2",
+    "expo": "~50.0.3",
     "expo-location": "~16.5.2",
     "expo-permissions": "^14.4.0",
     "expo-status-bar": "~1.11.1",
