@@ -27,8 +27,11 @@
       }
     },
     "android": {
-  
-      "permissions": ["INTERNET", "ACCESS_BACKGROUND_LOCATION", "ACCESS_FINE_LOCATION"],
+      "permissions": [
+        "INTERNET",
+        "ACCESS_BACKGROUND_LOCATION",
+        "ACCESS_FINE_LOCATION"
+      ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -36,6 +39,17 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "108e2f45-0d52-48b8-ba1e-e40c5a91e20e"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/108e2f45-0d52-48b8-ba1e-e40c5a91e20e"
     }
   }
 }
