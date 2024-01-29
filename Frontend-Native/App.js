@@ -4,7 +4,6 @@ import GoogleMap from './Components/Map';
 import ButtonLayout from './Components/Buttons';
 import { useEffect, useState } from 'react';
 import * as Location from 'expo-location';
-import GooglePlacesInput from './Components/Places';
 
 
 export default function App() {
@@ -41,19 +40,11 @@ export default function App() {
 
       <View style={styles.searchBox}>
 
-        <View style={styles.header}>
-          <Text>Drone Path Pro</Text>
+          <Text style={styles.logo_text}>Drone Path Pro</Text>
           <Image
             source={require('./assets/logo.png')} // Replace with the actual path to your image
-            style={styles.image}
+            style={styles.logo_img}
           />
-        </View>
-        
-        
-          <GooglePlacesInput
-
-            setSearchLocation={setSearchLocation}
-          /> 
         
       </View>
 
@@ -70,14 +61,16 @@ export default function App() {
         />
       </View>
 
-      <View style={styles.btnBox}>
-        <ButtonLayout
-          setAddPin={setAddPin}
-          setRemovePin={setRemovePin}
-          setDrawPath={setDrawPath}
-          setDeletePath={setDeletePath}
-        />
-      </View> 
+
+        <View style={styles.btnBox}>
+          <ButtonLayout
+            setAddPin={setAddPin}
+            setRemovePin={setRemovePin}
+            setDrawPath={setDrawPath}
+            setDeletePath={setDeletePath}
+          />
+        </View> 
+  
       
       
         
@@ -87,51 +80,51 @@ export default function App() {
 
 const styles = StyleSheet.create({
   container:{
-    // flex: 1,
-    height: '100%',
-    // paddingHorizontal: 8,
-    // backgroundColor: 'red'
+    // height: '100%',
+    flex: 1,
+    // flexDirection: 'column',
+    // justifyContent: 'center',
+  
   },
 
   searchBox: {
     backgroundColor: '#ff9b94',
-    // flex: 4,
-    height: '30%',
-    // paddingHorizontal: 8,
-    paddingTop: 40,
-    paddingBottom: 8,
-
-  },
-
-  header: {
+    // height: '12%',
+    flex: 1,
     backgroundColor: 'cyan',
     flexDirection: 'row',
-    paddingHorizontal: 8,
-    paddingVertical:8,
+    padding: 16,
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-    
+    alignItems: 'center'
+
   },
 
-  image: {
-    width: 30, // Set the width of the image
-    height: 30, // Set the height of the image
+  logo_text: {
+    fontSize: 24,
+    color: 'white',
+  },
+
+  logo_img: {
+    width: 30, 
+    height: 30, 
   },
 
   mapBox: {
     backgroundColor: 'green',
-    // paddingHorizontal: 8,
-    // flex: 6,
-    height: '45%',
+    // height: '68%',
+    flex: 7
   },
 
+
+
   btnBox: {
-    // backgroundColor: 'orange',
-    // flex: 1,
-    height: '25%',
-    justifyContent: 'top',
-    paddingTop: 16,
+    backgroundColor: 'orange',
+    // height: '10%',
+    flex: 2,
+    justifyContent: 'center',
+    flexDirection: 'column',
+    alignItems: 'center',
+    padding: 8,
   },
 
 
