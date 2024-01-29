@@ -243,7 +243,7 @@ const styles = StyleSheet.create({
     },
 
     featureItem: {
-        // marginLeft: 4,
+        color: 'white',
         
     },
 

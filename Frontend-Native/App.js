@@ -1,12 +1,22 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Image } from 'react-native';
+import { StyleSheet, Text, View, Image, Dimensions } from 'react-native';
 import GoogleMap from './Components/Map';
 import ButtonLayout from './Components/Buttons';
 import { useEffect, useState } from 'react';
 import * as Location from 'expo-location';
 
 
+const primaryCol = '#ED7D31' //'#FFBB64';
+const secondaryCol = '#4F4A45'//'#2D3250';
+const accent = 'white';
+
+
 export default function App() {
+
+  // Get the screen width
+  const [screenWidth, setScreenWidth] = useState(Dimensions.get('window').width);
+  
+  // console.log("Screen Width:", screenWidth);
 
 
   const [addPin, setAddPin] = useState(false);
@@ -88,10 +98,9 @@ const styles = StyleSheet.create({
   },
 
   searchBox: {
-    backgroundColor: '#ff9b94',
+    backgroundColor: primaryCol,
     // height: '12%',
     flex: 1,
-    backgroundColor: 'cyan',
     flexDirection: 'row',
     padding: 16,
     justifyContent: 'space-between',
@@ -110,17 +119,17 @@ const styles = StyleSheet.create({
   },
 
   mapBox: {
-    backgroundColor: 'green',
+    backgroundColor: secondaryCol,
     // height: '68%',
-    flex: 7
+    flex: 8 
   },
 
 
 
   btnBox: {
-    backgroundColor: 'orange',
+    backgroundColor: secondaryCol,
     // height: '10%',
-    flex: 2,
+    flex: 3,
     justifyContent: 'center',
     flexDirection: 'column',
     alignItems: 'center',

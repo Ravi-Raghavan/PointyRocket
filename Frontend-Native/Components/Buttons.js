@@ -9,6 +9,11 @@ const deletePath = '../assets/deltePath.png';
 const submit = '../assets/submit.png';
 const save = '../assets/save.png';
 
+// colors for UI
+const primaryCol = '#ED7D31' //'#FFBB64';
+const secondaryCol = '#4F4A45'//'#2D3250';
+const accent = 'white';
+
 const ButtonLayout = ({ setAddPin, setRemovePin, setDrawPath, setDeletePath }) =>{
 
     // * add button
@@ -50,7 +55,7 @@ const ButtonLayout = ({ setAddPin, setRemovePin, setDrawPath, setDeletePath }) =
                     </TouchableOpacity>
 
                     <View style={btnStyle.textContainer}>
-                        <Text>Add Pin</Text>
+                        <Text style={btnStyle.text}>Add Pin</Text>
                     </View>
 
 
@@ -69,7 +74,7 @@ const ButtonLayout = ({ setAddPin, setRemovePin, setDrawPath, setDeletePath }) =
                     </TouchableOpacity>
 
                     <View style={btnStyle.textContainer}>
-                        <Text>Clear Pin</Text>
+                        <Text style={btnStyle.text}>Clear Pin</Text>
                     </View>
 
 
@@ -88,7 +93,7 @@ const ButtonLayout = ({ setAddPin, setRemovePin, setDrawPath, setDeletePath }) =
                     </TouchableOpacity>
 
                     <View style={btnStyle.textContainer}>
-                        <Text>Draw Path</Text>
+                        <Text style={btnStyle.text}>Draw Path</Text>
                     </View>
 
 
@@ -110,7 +115,7 @@ const ButtonLayout = ({ setAddPin, setRemovePin, setDrawPath, setDeletePath }) =
                     </TouchableOpacity>
 
                     <View style={btnStyle.textContainer}>
-                        <Text>Delete Path</Text>
+                        <Text style={btnStyle.text}>Delete Path</Text>
                     </View>
 
 
@@ -129,7 +134,7 @@ const ButtonLayout = ({ setAddPin, setRemovePin, setDrawPath, setDeletePath }) =
                     </TouchableOpacity>
 
                     <View style={btnStyle.textContainer}>
-                        <Text>Submit</Text>
+                        <Text style={btnStyle.text}>Submit</Text>
                     </View>
 
 
@@ -148,7 +153,7 @@ const ButtonLayout = ({ setAddPin, setRemovePin, setDrawPath, setDeletePath }) =
                    </TouchableOpacity>
 
                     <View style={btnStyle.textContainer}>
-                        <Text>Save Path</Text>
+                        <Text style={btnStyle.text}>Save Path</Text>
                     </View>
 
                     
@@ -169,33 +174,36 @@ const btnStyle  = StyleSheet.create({
         width: '100%',
         height: '50%',
         flexDirection: 'row',
-        justifyContent: 'space-around',
-        alignItems: 'center',
-        backgroundColor: 'blue'
-    },
-
-    btnFrame: {
-        width: '33%',
-        height: '99%',
-        // borderRadius: 45,
-        backgroundColor: '#ff9b94',
         justifyContent: 'center',
         alignItems: 'center',
     },
 
-    ImageContainer: {
-        padding: 10, // Adjust padding as needed
-        backgroundColor: 'blue', // Background color for the space around the image
-        borderRadius: 45, // Adjust border radius as needed
+    btnFrame: {
+        justifyContent: 'center',
+        marginHorizontal: 40,
+        alignItems: 'center',
     },
 
-    image: { height: 20, width: 20 },
+    ImageContainer: {
+        padding: 8, // Adjust padding as needed
+        backgroundColor: primaryCol, // Background color for the space around the image
+        borderRadius: 10, // Adjust border radius as needed
+        borderColor: accent,
+        borderWidth: 2,
+        
+    },
+
+    image: { height: 30, width: 30 },
+
+    text: {fontSize:10},
 
     textContainer: {
         paddingVertical: 2  , // Adjust padding as needed
-        paddingHorizontal: 5, // Adjust padding as needed
-        backgroundColor: 'blue', // Background color for the space around the image
+        paddingHorizontal: 6, // Adjust padding as needed
+        backgroundColor: 'grey', // Background color for the space around the image
         borderRadius: 45, // Adjust border radius as needed
-        marginTop: 4,
+        marginTop: 8,
+        fontSize: 4,
+        opacity: 0.5,
     },
 });
