@@ -2,9 +2,7 @@ from flask import Flask, request
 from flask_cors import CORS
 import json
 import redis
-
 from pymongo import MongoClient
-
 
 #Flask Server Information
 app = Flask(__name__)
@@ -21,13 +19,6 @@ r = redis.Redis(
     host='redis-10297.c326.us-east-1-3.ec2.cloud.redislabs.com',
     port=10297,
     password='BkfdYjsO0yEZcJ6CZqFdavPAk1Xg9Esa')
-
-# Get the current length of the list containing documents
-starting_index = r.get("path_counter")
-if starting_index is not None:
-    starting_index = int(starting_index)
-else:
-    starting_index = 0
     
 #Set up Default Home Page
 @app.route("/")
@@ -41,10 +32,18 @@ def submit_path():
         data = request.get_json()
         print("Data Received: ", data) 
         
+        # Get the current length of the list containing documents
+        most_recent_path = r.get("path_counter")
+        if most_recent_path is not None:
+            most_recent_path = int(most_recent_path)
+        else:
+            r.set("path_counter", "0")
+            most_recent_path = 0
+        
         # Store Data in Redis
         key = r.incr("path_counter")
         path_data = json.dumps(data)
-        r.rpush(f"path:{key}", path_data)
+        r.set(f"path:{key}", path_data)
         r.rpush("path_list", key)
         
         return 'Data Successfully Submitted'
@@ -65,12 +64,13 @@ def save_data():
         if most_recent_path is not None:
             most_recent_path = int(most_recent_path)
         else:
+            r.set("path_counter", 0)
             most_recent_path = 0
 
         print("Most Recent Path Index:", most_recent_path)
 
         #Fetch Path Data of Most Recent Path
-        path_data = r.lrange(f"path:{most_recent_path}", 0, -1)[0]
+        path_data = r.get(f"path:{most_recent_path}")
         path_data = json.loads(path_data)
 
         #Get MongoDB Collection
