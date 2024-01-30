@@ -13,19 +13,17 @@ const accent = 'white';
 
 export default function App() {
 
-  // Get the screen width
-  const [screenWidth, setScreenWidth] = useState(Dimensions.get('window').width);
-  
-  // console.log("Screen Width:", screenWidth);
-
-
   const [addPin, setAddPin] = useState(false);
   const [removePin, setRemovePin] = useState(false);
   const [drawPath, setDrawPath] = useState(false);
   const [deletePath, setDeletePath] = useState(false);
+  const [drawn, setDrawn] = useState(false);
   const [searchLocation, setSearchLocation] = useState(null);
-
+  const [marker, setMarker] = useState(null);
   const [userLocation, setUserLocation] = useState(null); // users current location
+  const [submit, isSubmit] = useState(false);
+  const [toSave, isToSave] = useState(false);
+  const [colorSent, setColorSent] = useState(false);
 
 
   async function requestPermission() {
@@ -63,21 +61,38 @@ export default function App() {
           searchLocation={searchLocation}
           setSearchLocation={setSearchLocation}
           userLocation={userLocation}
+          marker={marker}
+          setMarker={setMarker}
           addPin={addPin}
           removePin={removePin}
           setRemovePin={setRemovePin}
           drawPath={drawPath}
           deletePath={deletePath}
+          setDeletePath={setDeletePath}
+          setDrawn={setDrawn}
+          submit={submit}
+          isSubmit={isSubmit}
+          toSave={toSave}
+          isToSave={isToSave}
+          setColorSent={setColorSent}
         />
       </View>
 
 
         <View style={styles.btnBox}>
           <ButtonLayout
+            marker={marker}
+            addPin={addPin}
             setAddPin={setAddPin}
             setRemovePin={setRemovePin}
+            drawPath={drawPath}
             setDrawPath={setDrawPath}
             setDeletePath={setDeletePath}
+            drawn={drawn}
+          isSubmit={isSubmit}
+          isToSave={isToSave}
+          colorSent={colorSent}
+          setColorSent={setColorSent}
           />
         </View> 
   

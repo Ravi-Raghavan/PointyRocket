@@ -11,18 +11,27 @@ const initialRegion = {
     longitudeDelta: 0.01
 };
 
+const ipAddress = 'https://factual-moved-snapper.ngrok-free.app/submit_path';
+const ipAddressSave = 'https://factual-moved-snapper.ngrok-free.app/save_data';
+
 const routerRange = 94 // meters
 
 export default function GoogleMap({ searchLocation, setSearchLocation, userLocation,
+    marker, setMarker,
     addPin, 
     removePin, setRemovePin, 
     drawPath, 
-    deletePath }) {
+    deletePath, setDeletePath,
+    setDrawn,
+    submit, isSubmit,
+    toSave, isToSave,
+    setColorSent
+ }) {
 
     const mapRef = useRef(null);
 
     const [center, setCenter] = useState(initialRegion);
-    const [marker, setMarker] = useState(null);
+    
     const [polylinePath, setPolylinePath] = useState([]);
 
     const [mapType, setMapType] = useState('standard');
@@ -104,6 +113,7 @@ export default function GoogleMap({ searchLocation, setSearchLocation, userLocat
             setMarker(null);
             setRemovePin(false);
             setPolylinePath([]);
+            setDrawn(false);
         }
     };
 
@@ -115,10 +125,11 @@ export default function GoogleMap({ searchLocation, setSearchLocation, userLocat
         
         const { coordinate } = event.nativeEvent;
         if (marker && isPointInsideCircle(coordinate, marker, routerRange)) {
-            
+            // console.log("locaiton", coordinate);
             setPolylinePath([...polylinePath, coordinate]);
-            // console.log(polylinePath);
 
+            // console.log(polylinePath);
+            setDrawn(true);
            
         }
     };
@@ -127,10 +138,85 @@ export default function GoogleMap({ searchLocation, setSearchLocation, userLocat
     const deletePolyPath = () => {
         if(deletePath && marker && polylinePath){
             setPolylinePath([]);
+            setDeletePath(false);
+            setDrawn(false);
         }
     };
 
-    useEffect(() => {deletePolyPath();}, [deletePath]);
+    useEffect(() => { deletePolyPath(); }, [deletePath]);
+
+
+    // * when submitting file
+    const submitPath = () => {
+        
+        if(polylinePath && submit){
+          
+           try{ 
+               const dataToSend = { path: polylinePath };
+
+               
+
+               fetch(ipAddress, {
+                   method: 'POST',
+                   headers: {
+                       'Accept': 'application/json',
+                       'Content-Type': 'application/json',
+                   },
+                   body: JSON.stringify({ path: polylinePath })
+               })
+
+               console.log('data that is sent', dataToSend.path.length);
+               isSubmit(false);
+            //    setPolylinePath([]);
+            //    setDeletePath(false);
+            //    setDrawn(false);
+           } catch (error) {
+               // Handle the error
+               console.error('An error occurred:', error.message);
+               // You can also perform additional actions here, such as logging, notifying the user, etc.
+           }
+
+        };
+    };
+
+    useEffect(() => { submitPath(); }, [submit])
+
+
+    // * when saved button is clicked
+    const savePath = () => {
+
+        if (polylinePath && toSave) {
+          
+            try {
+                const dataToSend = { path: polylinePath };
+
+
+
+                fetch(ipAddressSave, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ path: polylinePath })
+                })
+
+                console.log('data that is saved', dataToSend.path.length);
+
+                console.log('attempting to submit path');
+
+                isToSave(false);
+                setColorSent(true);
+            } catch (error) {
+                // Handle the error
+                console.error('An error occurred:', error.message);
+                // You can also perform additional actions here, such as logging, notifying the user, etc.
+            }
+
+        };
+    };
+
+    useEffect(() => { savePath(); }, [toSave])
 
 
     return (
@@ -160,13 +246,13 @@ export default function GoogleMap({ searchLocation, setSearchLocation, userLocat
                 showsScale
                 showsBuildings
                 zoomControlEnabled
-                // userInterfaceStyle='dark'
+                userInterfaceStyle='dark'
+                
                 showsUserLocation = {true}
                 loadingEnabled={true}
                 showsMyLocationButton
                 showsPointsOfInterest
                 onPress={addMarker}
-
                 onPanDrag={drawPath? getPoint: null}
                 scrollEnabled={!drawPath}
              >

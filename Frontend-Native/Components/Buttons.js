@@ -1,24 +1,33 @@
+import { useEffect, useState } from "react";
 import { View, Button, StyleSheet, Image, Text, TouchableOpacity } from "react-native";
 
 
 // image file path
-const addPin = '../assets/marker.png';
+const add= '../assets/marker.png';
 const removePin = '../assets/removePin.png';
-const drawPath = '../assets/draw.png';
-const deletePath = '../assets/deltePath.png';
+const draw = '../assets/draw.png';
+const deletePath = '../assets/delete.png';
 const submit = '../assets/submit.png';
 const save = '../assets/save.png';
+const open = '../assets/open.png';
 
 // colors for UI
 const primaryCol = '#ED7D31' //'#FFBB64';
 const secondaryCol = '#4F4A45'//'#2D3250';
 const accent = 'white';
+const toggle = '#005B41';
+const sent = '#232D3F';
 
-const ButtonLayout = ({ setAddPin, setRemovePin, setDrawPath, setDeletePath }) =>{
+const ButtonLayout = ({ marker, addPin, setAddPin, setRemovePin, drawPath, setDrawPath, setDeletePath, drawn, isSubmit, isToSave,
+    colorSent, setColorSent }) =>{
+
+    const [addtoggled, isAddToggled] = useState(false);
+    const [drawtoggled, isDrawToggled] = useState(false);
 
     // * add button
     const handleAddPin = () => {
         setAddPin(prev => !prev);
+        isAddToggled(prev => !prev);
     };
 
     // * clear button
@@ -29,41 +38,70 @@ const ButtonLayout = ({ setAddPin, setRemovePin, setDrawPath, setDeletePath }) =
     // * draw path button
     const handleDrawPath = () => {
         setDrawPath(prev =>!prev);
+        isDrawToggled(prev => !prev);
     };
 
     // * delete path button
     const handleDeletePath = () => {
-        setDeletePath(prev =>!prev);
+        if(draw) {
+            setDeletePath(true);
+        }
+        
     };
 
+    // * submit button
+    const handleSubmit = () => {
+        if (drawn) {
+            isSubmit(true);
+        }
+    };
+
+
+    // * save path button
+    const handleSave = () => {
+        if (drawn) {
+            isToSave(true);
+        }
+    };
     
+    useEffect(() =>{
+        if (colorSent) {
+            
+            const timeoutId = setTimeout(() => {
+                setColorSent(false);
+            }, 2000); 
+
+            // Clean up the timeout if component unmounts or colorSent changes again
+            return () => clearTimeout(timeoutId);
+        }
+    }, [colorSent])
 
     return (
         <>
              <View style={btnStyle.btnLayer}>
 
-                <View style={btnStyle.btnFrame} >
+                <View style={[btnStyle.btnFrame, drawPath  ? btnStyle.inactive : null]} >
 
-                    <TouchableOpacity onPress={handleAddPin}>
+                    <TouchableOpacity disabled={drawPath} onPress={handleAddPin}>
 
-                        <View style={btnStyle.ImageContainer}>
+                        <View style={[btnStyle.ImageContainer,  addtoggled ? {backgroundColor: toggle} : null  ]}>
                             <Image
-                                source={require(addPin)}
+                                source={require(add)}
                                 style={btnStyle.image}
                             />
                         </View>
                     </TouchableOpacity>
 
                     <View style={btnStyle.textContainer}>
-                        <Text style={btnStyle.text}>Add Pin</Text>
+                        <Text style={btnStyle.text}>Add</Text>
                     </View>
 
 
                 </View>
 
-                <View style={btnStyle.btnFrame} >
+                <View style={[btnStyle.btnFrame, drawPath || !marker ? btnStyle.inactive : null]} >
 
-                    <TouchableOpacity onPress={handleAddPin}>
+                    <TouchableOpacity disabled={drawPath || !marker} onPress={handleClearPin}>
 
                         <View style={btnStyle.ImageContainer}>
                             <Image
@@ -74,37 +112,34 @@ const ButtonLayout = ({ setAddPin, setRemovePin, setDrawPath, setDeletePath }) =
                     </TouchableOpacity>
 
                     <View style={btnStyle.textContainer}>
-                        <Text style={btnStyle.text}>Clear Pin</Text>
+                        <Text style={btnStyle.text}>Clear</Text>
                     </View>
 
 
                 </View>
 
-                <View style={btnStyle.btnFrame} >
+                <View style={[btnStyle.btnFrame, addPin || !marker ? btnStyle.inactive : null]} >
 
-                    <TouchableOpacity onPress={handleAddPin}>
+                    <TouchableOpacity disabled={addPin || !marker} onPress={handleDrawPath}>
 
-                        <View style={btnStyle.ImageContainer}>
+                        <View style={[btnStyle.ImageContainer, drawtoggled ? { backgroundColor: toggle } : null]}>
                             <Image
-                                source={require(drawPath)}
+                                source={require(draw)}
                                 style={btnStyle.image}
                             />
                         </View>
                     </TouchableOpacity>
 
                     <View style={btnStyle.textContainer}>
-                        <Text style={btnStyle.text}>Draw Path</Text>
+                        <Text style={btnStyle.text}>Draw</Text>
                     </View>
 
 
                 </View>
-            </View>
 
-            <View style={btnStyle.btnLayer}>
+                <View style={[btnStyle.btnFrame, !drawn ? btnStyle.inactive : null]} >
 
-                <View style={btnStyle.btnFrame} >
-
-                    <TouchableOpacity onPress={handleAddPin}>
+                    <TouchableOpacity disabled={!drawn} onPress={handleDeletePath}>
 
                         <View style={btnStyle.ImageContainer}>
                             <Image
@@ -115,15 +150,23 @@ const ButtonLayout = ({ setAddPin, setRemovePin, setDrawPath, setDeletePath }) =
                     </TouchableOpacity>
 
                     <View style={btnStyle.textContainer}>
-                        <Text style={btnStyle.text}>Delete Path</Text>
+                        <Text style={btnStyle.text}>Erase</Text>
                     </View>
 
 
                 </View>
+            </View>
 
-                <View style={btnStyle.btnFrame} >
+            
 
-                    <TouchableOpacity onPress={handleAddPin}>
+            <View style={btnStyle.btnLayer}>
+
+               
+                
+
+                <View style={[btnStyle.btnFrame, !drawn ? btnStyle.inactive : null, colorSent ? btnStyle.pressed : null]} >
+
+                    <TouchableOpacity disabled={!drawn} onPress={handleSubmit}>
 
                         <View style={btnStyle.ImageContainer}>
                             <Image
@@ -140,9 +183,9 @@ const ButtonLayout = ({ setAddPin, setRemovePin, setDrawPath, setDeletePath }) =
 
                 </View>
 
-                <View style={btnStyle.btnFrame} >
+                <View style={[btnStyle.btnFrame, !drawn ? btnStyle.inactive : null]} >
 
-                    <TouchableOpacity onPress={handleAddPin}>
+                    <TouchableOpacity disabled={!drawn} onPress={handleSave}>
 
                         <View style={btnStyle.ImageContainer}>
                             <Image
@@ -153,10 +196,29 @@ const ButtonLayout = ({ setAddPin, setRemovePin, setDrawPath, setDeletePath }) =
                    </TouchableOpacity>
 
                     <View style={btnStyle.textContainer}>
-                        <Text style={btnStyle.text}>Save Path</Text>
+                        <Text style={btnStyle.text}>Save</Text>
                     </View>
 
                     
+                </View>
+
+                <View style={btnStyle.btnFrame} >
+
+                    <TouchableOpacity >
+
+                        <View style={btnStyle.ImageContainer}>
+                            <Image
+                                source={require(open)}
+                                style={btnStyle.image}
+                            />
+                        </View>
+                    </TouchableOpacity>
+
+                    <View style={btnStyle.textContainer}>
+                        <Text style={btnStyle.text}>Load</Text>
+                    </View>
+
+
                 </View>
             </View>
             
@@ -170,6 +232,20 @@ export default ButtonLayout;
 
 const btnStyle  = StyleSheet.create({
 
+    active: {
+        opacity: 1,
+        backgroundColor: toggle,
+    },
+
+    inactive: {
+        opacity: 0.5,
+        backgroundColor: secondaryCol,
+    },
+
+    pressed: {
+        backgroundColor: sent,
+    },
+
     btnLayer: {
         width: '100%',
         height: '50%',
@@ -180,8 +256,9 @@ const btnStyle  = StyleSheet.create({
 
     btnFrame: {
         justifyContent: 'center',
-        marginHorizontal: 40,
+        marginHorizontal: 20,
         alignItems: 'center',
+        
     },
 
     ImageContainer: {
