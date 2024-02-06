@@ -25,6 +25,15 @@ r = redis.Redis(
 def hello_world():
     return "<p>Backend Flask Server</p>"
 
+#Solve Traveling Salesman Problem 
+@app.route("/traveling_salesman", methods = ["POST"])
+def traveling_salesman():
+    if request.method == "POST":
+        data = request.get_json()
+        print("Data Received: ", data)
+        
+        return "Successfully Submitted"
+
 #Receive Data from Front End
 @app.route("/submit_path", methods=['POST'])
 def submit_path():
