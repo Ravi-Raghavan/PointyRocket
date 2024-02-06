@@ -13,6 +13,7 @@ const initialRegion = {
 
 const ipAddress = 'https://factual-moved-snapper.ngrok-free.app/submit_path';
 const ipAddressSave = 'https://factual-moved-snapper.ngrok-free.app/save_data';
+const ipAddresRoute = 'https://factual-moved-snapper.ngrok-free.app/traveling_salesman';
 
 const routerRange = 94 // meters
 
@@ -25,7 +26,8 @@ export default function GoogleMap({ searchLocation, setSearchLocation, userLocat
     setDrawn,
     submit, isSubmit,
     toSave, isToSave,
-    setColorSent
+    isStartLoc, isDestination,
+    isRoute, setRoute
  }) {
 
     const mapRef = useRef(null);
@@ -35,6 +37,10 @@ export default function GoogleMap({ searchLocation, setSearchLocation, userLocat
     const [polylinePath, setPolylinePath] = useState([]);
 
     const [mapType, setMapType] = useState('standard');
+
+    const [startLocation, setStartLocation] = useState(null);
+
+    const [ destinations, setDestinations] = useState([]);
 
 
 
@@ -100,11 +106,27 @@ export default function GoogleMap({ searchLocation, setSearchLocation, userLocat
     
     // * adds marker
     const addMarker = (event) => {
+
+        // adds router location
         if(addPin){
             const { coordinate } = event.nativeEvent;
             setMarker(coordinate);
             setPolylinePath([]);
         }
+
+        // adds start location for drone
+        else if (marker && isStartLoc){
+            const { coordinate } = event.nativeEvent;
+            setStartLocation(coordinate);
+        }
+
+        // have to ensure start locaiton added
+        else if (marker && startLocation && isDestination) {
+            const { coordinate } = event.nativeEvent;
+            setDestinations([...destinations, coordinate]);
+            console.log('total', destinations.length);
+        };
+
     };
 
     // * removes marker
@@ -219,6 +241,40 @@ export default function GoogleMap({ searchLocation, setSearchLocation, userLocat
     useEffect(() => { savePath(); }, [toSave])
 
 
+    // * saves route to backend
+    const saveRoute = () => {
+        if ( startLocation && destinations.length > 0 && isRoute) {
+            try {
+                const dataToSend = { startPoint: startLocation, destinations: destinations };
+
+
+
+                fetch(ipAddresRoute, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(dataToSend)
+                })
+
+                console.log('data that is sent', dataToSend.destinations.length);
+                console.log('data that is sent', dataToSend.startPoint);
+                // isSubmit(false);
+                //    setPolylinePath([]);
+                //    setDeletePath(false);
+                //    setDrawn(false);
+            } catch (error) {
+                // Handle the error
+                console.error('An error occurred:', error.message);
+                // You can also perform additional actions here, such as logging, notifying the user, etc.
+            }
+
+        };
+    };
+
+    useEffect(() => { saveRoute(); }, [isRoute])
+
     return (
         <View style={styles.container}>
 
@@ -280,6 +336,20 @@ export default function GoogleMap({ searchLocation, setSearchLocation, userLocat
                             coordinate={marker}
                         />
 
+                        {startLocation && (
+                            <Marker
+                                coordinate={startLocation}
+                                image={require('../assets/start.png')}
+                            />
+                        )}
+
+                        {destinations && destinations.map((destination, index) => (
+                            <Marker
+                                key={index} // Make sure to set a unique key for each marker
+                                coordinate={destination}
+                                
+                            />
+                        ))}
                        
 
                         

@@ -19,7 +19,7 @@ const toggle = '#005B41';
 const sent = '#232D3F';
 
 const ButtonLayout = ({ marker, addPin, setAddPin, setRemovePin, drawPath, setDrawPath, setDeletePath, drawn, isSubmit, isToSave,
-    colorSent, setColorSent }) =>{
+    setIsStartLoc, setIsDestination, setRoute }) =>{
 
     const [addtoggled, isAddToggled] = useState(false);
     const [drawtoggled, isDrawToggled] = useState(false);
@@ -64,17 +64,21 @@ const ButtonLayout = ({ marker, addPin, setAddPin, setRemovePin, drawPath, setDr
         }
     };
     
-    useEffect(() =>{
-        if (colorSent) {
-            
-            const timeoutId = setTimeout(() => {
-                setColorSent(false);
-            }, 2000); 
 
-            // Clean up the timeout if component unmounts or colorSent changes again
-            return () => clearTimeout(timeoutId);
-        }
-    }, [colorSent])
+    // * adds start location
+    const handleStartLocation = () => {
+        setIsStartLoc(prev => !prev);;
+    };
+
+
+    // * adds destinations stops setting boolean to true
+    const handleDestinations = () => {
+        setIsDestination(prev => !prev);
+    };
+
+    const handleRoute = () => {
+        setRoute(true);
+    };
 
     return (
         <>
@@ -220,6 +224,64 @@ const ButtonLayout = ({ marker, addPin, setAddPin, setRemovePin, drawPath, setDr
 
 
                 </View>
+
+                <View style={btnStyle.btnFrame} >
+
+                    <TouchableOpacity onPress={handleStartLocation}>
+
+                        <View style={btnStyle.ImageContainer}>
+                            <Image
+                                source={require(open)}
+                                style={btnStyle.image}
+                            />
+                        </View>
+                    </TouchableOpacity>
+
+                    <View style={btnStyle.textContainer}>
+                        <Text style={btnStyle.text}>Start Location</Text>
+                    </View>
+
+
+                </View>
+
+
+                <View style={btnStyle.btnFrame} >
+
+                    <TouchableOpacity onPress={handleDestinations}>
+
+                        <View style={btnStyle.ImageContainer}>
+                            <Image
+                                source={require(open)}
+                                style={btnStyle.image}
+                            />
+                        </View>
+                    </TouchableOpacity>
+
+                    <View style={btnStyle.textContainer}>
+                        <Text style={btnStyle.text}>Destinations</Text>
+                    </View>
+
+
+                </View>
+
+                <View style={[btnStyle.btnFrame]} >
+
+                    <TouchableOpacity  onPress={handleRoute}>
+
+                        <View style={btnStyle.ImageContainer}>
+                            <Image
+                                source={require(save)}
+                                style={btnStyle.image}
+                            />
+                        </View>
+                    </TouchableOpacity>
+
+                    <View style={btnStyle.textContainer}>
+                        <Text style={btnStyle.text}>Route</Text>
+                    </View>
+
+
+                </View>
             </View>
             
 
@@ -256,7 +318,8 @@ const btnStyle  = StyleSheet.create({
 
     btnFrame: {
         justifyContent: 'center',
-        marginHorizontal: 20,
+        // marginHorizontal: 10,
+        marginRight: 10,
         alignItems: 'center',
         
     },

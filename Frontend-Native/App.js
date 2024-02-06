@@ -25,6 +25,14 @@ export default function App() {
   const [toSave, isToSave] = useState(false);
   const [colorSent, setColorSent] = useState(false);
 
+  // const [addStartLoc, setAddStartLoc] = useState([]);
+  const  [isStartLoc, setIsStartLoc] = useState(false);
+  const [isDestination, setIsDestination] = useState(false);
+
+
+  // submits the route
+  const [isRoute, setRoute] = useState(false);
+
 
   async function requestPermission() {
     const {status} = await Location.requestForegroundPermissionsAsync();
@@ -74,7 +82,11 @@ export default function App() {
           isSubmit={isSubmit}
           toSave={toSave}
           isToSave={isToSave}
-          setColorSent={setColorSent}
+          isStartLoc={isStartLoc}
+          isDestination={isDestination}
+          isRoute={isRoute}
+          setRoute={setRoute}
+          
         />
       </View>
 
@@ -91,8 +103,9 @@ export default function App() {
             drawn={drawn}
           isSubmit={isSubmit}
           isToSave={isToSave}
-          colorSent={colorSent}
-          setColorSent={setColorSent}
+          setIsStartLoc={setIsStartLoc}
+          setIsDestination={setIsDestination}
+          setRoute={setRoute}
           />
         </View> 
   
