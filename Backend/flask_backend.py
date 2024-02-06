@@ -32,6 +32,8 @@ def traveling_salesman():
         data = request.get_json()
         print("Data Received: ", data)
         
+        print(type(data))
+        
         return "Successfully Submitted"
 
 #Receive Data from Front End
