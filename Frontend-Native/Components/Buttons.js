@@ -168,7 +168,7 @@ const ButtonLayout = ({ marker, addPin, setAddPin, setRemovePin, drawPath, setDr
                
                 
 
-                <View style={[btnStyle.btnFrame, !drawn ? btnStyle.inactive : null, colorSent ? btnStyle.pressed : null]} >
+                <View style={[btnStyle.btnFrame, !drawn ? btnStyle.inactive : null]} >
 
                     <TouchableOpacity disabled={!drawn} onPress={handleSubmit}>
 
