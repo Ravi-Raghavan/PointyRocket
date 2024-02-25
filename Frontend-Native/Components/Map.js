@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import MapView, {Marker, Circle, Polyline} from 'react-native-maps';
 import { Text, StyleSheet, View } from 'react-native';
+import Constants from 'expo-constants';
 
 
 // initial region when map laods
@@ -17,6 +18,8 @@ const ipAddresRoute = 'https://factual-moved-snapper.ngrok-free.app/traveling_sa
 
 const routerRange = 94 // meters
 
+const router = '../assets/router.png'; // 64px
+
 export default function GoogleMap({ searchLocation, setSearchLocation, userLocation,
     marker, setMarker,
     addPin, 
@@ -27,7 +30,8 @@ export default function GoogleMap({ searchLocation, setSearchLocation, userLocat
     submit, isSubmit,
     toSave, isToSave,
     isStartLoc, isDestination,
-    isRoute, setRoute
+    isRoute, setRoute,
+    newPath, setNewPath,
  }) {
 
     const mapRef = useRef(null);
@@ -166,6 +170,21 @@ export default function GoogleMap({ searchLocation, setSearchLocation, userLocat
     };
 
     useEffect(() => { deletePolyPath(); }, [deletePath]);
+
+    // * adds loaded path
+    const addLoadedPath = () => {
+        if(newPath){
+
+            
+            setMarker(newPath.center);
+            setPolylinePath(newPath.route);
+            focusMarker();
+            setNewPath(null);
+        }
+    };
+
+    useEffect(() => { addLoadedPath(); }, [newPath, ]);
+
 
 
     // * when submitting file
@@ -319,7 +338,7 @@ export default function GoogleMap({ searchLocation, setSearchLocation, userLocat
                         {polylinePath && (
                             <Polyline
                                 coordinates={polylinePath}
-                                strokeColor="#FF0000"
+                                strokeColor={'#ED7D31'}
                                 strokeWidth={2}
                                 style = {{opacity: drawPath? 1 : 0.3}}
                                 
@@ -329,11 +348,14 @@ export default function GoogleMap({ searchLocation, setSearchLocation, userLocat
                         <Circle
                             center={marker}
                             radius={routerRange}
-                            // fillColor='#fcd3a7'
+                            fillColor='rgba(237, 125, 49, 0.05)'
                             onPanDrag={getPoint}
+                            strokeColor='grey'
+                            // strokeWidth="2"
                         /> 
                         <Marker
                             coordinate={marker}
+                            image={require(router)}
                         />
 
                         {startLocation && (

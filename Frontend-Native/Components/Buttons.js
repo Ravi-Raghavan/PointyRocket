@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { View, Button, StyleSheet, Image, Text, TouchableOpacity } from "react-native";
+import { View, Button, StyleSheet, Image, Text, TouchableOpacity, Dimensions } from "react-native";
 
 
 // image file path
@@ -10,6 +10,8 @@ const deletePath = '../assets/delete.png';
 const submit = '../assets/submit.png';
 const save = '../assets/save.png';
 const open = '../assets/open.png';
+const origin = '../assets/track.png';
+const stops = '../assets/sign.png';
 
 // colors for UI
 const primaryCol = '#ED7D31' //'#FFBB64';
@@ -18,8 +20,12 @@ const accent = 'white';
 const toggle = '#005B41';
 const sent = '#232D3F';
 
+
+// screen dimensions
+const { width } = Dimensions.get('window');
+
 const ButtonLayout = ({ marker, addPin, setAddPin, setRemovePin, drawPath, setDrawPath, setDeletePath, drawn, isSubmit, isToSave,
-    setIsStartLoc, setIsDestination, setRoute }) =>{
+    setIsStartLoc, setIsDestination, setRoute, setClosePopUp }) =>{
 
     const [addtoggled, isAddToggled] = useState(false);
     const [drawtoggled, isDrawToggled] = useState(false);
@@ -64,6 +70,10 @@ const ButtonLayout = ({ marker, addPin, setAddPin, setRemovePin, drawPath, setDr
         }
     };
     
+    // * load path button
+    const handleLoad = () => {
+        setClosePopUp(true);
+    };
 
     // * adds start location
     const handleStartLocation = () => {
@@ -80,9 +90,13 @@ const ButtonLayout = ({ marker, addPin, setAddPin, setRemovePin, drawPath, setDr
         setRoute(true);
     };
 
+
+    
+
     return (
         <>
-             <View style={btnStyle.btnLayer}>
+        
+            <View style={[btnStyle.btnLayer, { flexWrap: 'wrap' }]} >
 
                 <View style={[btnStyle.btnFrame, drawPath  ? btnStyle.inactive : null]} >
 
@@ -159,14 +173,45 @@ const ButtonLayout = ({ marker, addPin, setAddPin, setRemovePin, drawPath, setDr
 
 
                 </View>
-            </View>
 
-            
+                <View style={btnStyle.btnFrame} >
 
-            <View style={btnStyle.btnLayer}>
+                    <TouchableOpacity onPress={handleStartLocation}>
 
-               
-                
+                        <View style={btnStyle.ImageContainer}>
+                            <Image
+                                source={require(origin)}
+                                style={btnStyle.image}
+                            />
+                        </View>
+                    </TouchableOpacity>
+
+                    <View style={btnStyle.textContainer}>
+                        <Text style={btnStyle.text}>Origin</Text>
+                    </View>
+
+
+                </View>
+
+
+                <View style={btnStyle.btnFrame} >
+
+                    <TouchableOpacity onPress={handleDestinations}>
+
+                        <View style={btnStyle.ImageContainer}>
+                            <Image
+                                source={require(stops)}
+                                style={btnStyle.image}
+                            />
+                        </View>
+                    </TouchableOpacity>
+
+                    <View style={btnStyle.textContainer}>
+                        <Text style={btnStyle.text}>Stops</Text>
+                    </View>
+
+
+                </View>
 
                 <View style={[btnStyle.btnFrame, !drawn ? btnStyle.inactive : null]} >
 
@@ -197,18 +242,18 @@ const ButtonLayout = ({ marker, addPin, setAddPin, setRemovePin, drawPath, setDr
                                 style={btnStyle.image}
                             />
                         </View>
-                   </TouchableOpacity>
+                    </TouchableOpacity>
 
                     <View style={btnStyle.textContainer}>
                         <Text style={btnStyle.text}>Save</Text>
                     </View>
 
-                    
+
                 </View>
 
                 <View style={btnStyle.btnFrame} >
 
-                    <TouchableOpacity >
+                    <TouchableOpacity onPress={handleLoad}>
 
                         <View style={btnStyle.ImageContainer}>
                             <Image
@@ -225,67 +270,8 @@ const ButtonLayout = ({ marker, addPin, setAddPin, setRemovePin, drawPath, setDr
 
                 </View>
 
-                <View style={btnStyle.btnFrame} >
-
-                    <TouchableOpacity onPress={handleStartLocation}>
-
-                        <View style={btnStyle.ImageContainer}>
-                            <Image
-                                source={require(open)}
-                                style={btnStyle.image}
-                            />
-                        </View>
-                    </TouchableOpacity>
-
-                    <View style={btnStyle.textContainer}>
-                        <Text style={btnStyle.text}>Start Location</Text>
-                    </View>
-
-
-                </View>
-
-
-                <View style={btnStyle.btnFrame} >
-
-                    <TouchableOpacity onPress={handleDestinations}>
-
-                        <View style={btnStyle.ImageContainer}>
-                            <Image
-                                source={require(open)}
-                                style={btnStyle.image}
-                            />
-                        </View>
-                    </TouchableOpacity>
-
-                    <View style={btnStyle.textContainer}>
-                        <Text style={btnStyle.text}>Destinations</Text>
-                    </View>
-
-
-                </View>
-
-                <View style={[btnStyle.btnFrame]} >
-
-                    <TouchableOpacity  onPress={handleRoute}>
-
-                        <View style={btnStyle.ImageContainer}>
-                            <Image
-                                source={require(save)}
-                                style={btnStyle.image}
-                            />
-                        </View>
-                    </TouchableOpacity>
-
-                    <View style={btnStyle.textContainer}>
-                        <Text style={btnStyle.text}>Route</Text>
-                    </View>
-
-
-                </View>
             </View>
             
-
-                
         </>
     );
 };
@@ -293,6 +279,7 @@ const ButtonLayout = ({ marker, addPin, setAddPin, setRemovePin, drawPath, setDr
 export default ButtonLayout;
 
 const btnStyle  = StyleSheet.create({
+
 
     active: {
         opacity: 1,
@@ -310,10 +297,11 @@ const btnStyle  = StyleSheet.create({
 
     btnLayer: {
         width: '100%',
-        height: '50%',
+        // height: '100%',
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
+
     },
 
     btnFrame: {
@@ -321,6 +309,7 @@ const btnStyle  = StyleSheet.create({
         // marginHorizontal: 10,
         marginRight: 10,
         alignItems: 'center',
+        marginTop: 15,
         
     },
 
