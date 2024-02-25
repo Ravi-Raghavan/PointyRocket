@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import MapView, {Marker, Circle, Polyline} from 'react-native-maps';
-import { Text, StyleSheet, View } from 'react-native';
-import Constants from 'expo-constants';
+import { Text, StyleSheet, View, TouchableOpacity, Image, TextInput, Pressable } from 'react-native';
+import Modal from "react-native-modal";
 
 
 // initial region when map laods
@@ -12,6 +12,10 @@ const initialRegion = {
     longitudeDelta: 0.01
 };
 
+const primaryCol = '#ED7D31' //'#FFBB64';
+const secondaryCol = '#4F4A45'//'#2D3250';
+const accent = 'white';
+
 const ipAddress = 'https://factual-moved-snapper.ngrok-free.app/submit_path';
 const ipAddressSave = 'https://factual-moved-snapper.ngrok-free.app/save_data';
 const ipAddresRoute = 'https://factual-moved-snapper.ngrok-free.app/traveling_salesman';
@@ -19,6 +23,7 @@ const ipAddresRoute = 'https://factual-moved-snapper.ngrok-free.app/traveling_sa
 const routerRange = 94 // meters
 
 const router = '../assets/router.png'; // 64px
+const cancel = '../assets/cancel.png';
 
 export default function GoogleMap({ searchLocation, setSearchLocation, userLocation,
     marker, setMarker,
@@ -45,6 +50,10 @@ export default function GoogleMap({ searchLocation, setSearchLocation, userLocat
     const [startLocation, setStartLocation] = useState(null);
 
     const [ destinations, setDestinations] = useState([]);
+
+    const [inputValue, setInputValue] = useState('');
+
+  
 
 
 
@@ -105,6 +114,11 @@ export default function GoogleMap({ searchLocation, setSearchLocation, userLocat
             default:
                 setMapType('standard');
         }
+    };
+
+    //  TODO user input for path name
+    const handleInputChange = (text) => {
+        if (text.length <= 20) setInputValue(text);
     };
     
     
@@ -223,73 +237,77 @@ export default function GoogleMap({ searchLocation, setSearchLocation, userLocat
     useEffect(() => { submitPath(); }, [submit])
 
 
+
     // * when saved button is clicked
     const savePath = () => {
 
-        if (polylinePath && toSave) {
+        if (polylinePath && inputValue) {
+
+            data = {
+                name: inputValue,
+                center: marker,
+                route: polylinePath
+            }
+
+            // closes pop up box
+            isToSave(false);
+            setInputValue(''); // CLEARS input
+
+            console.log('data that is saved', data.name);
           
-            try {
-                const dataToSend = { path: polylinePath };
-
-
-
+            try {     
                 fetch(ipAddressSave, {
                     method: 'POST',
                     headers: {
                         'Accept': 'application/json',
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ path: polylinePath })
+                    body: JSON.stringify(data)
                 })
 
-                console.log('data that is saved', dataToSend.path.length);
-
-                console.log('attempting to submit path');
-
-                isToSave(false);
-                setColorSent(true);
+                // isToSave(false);
             } catch (error) {
-                // Handle the error
                 console.error('An error occurred:', error.message);
-                // You can also perform additional actions here, such as logging, notifying the user, etc.
-            }
+             }
 
         };
     };
 
-    useEffect(() => { savePath(); }, [toSave])
+    // useEffect(() => { savePath(); }, [toSave])
 
 
     // * saves route to backend
     const saveRoute = () => {
-        if ( startLocation && destinations.length > 0 && isRoute) {
-            try {
-                const dataToSend = { startPoint: startLocation, destinations: destinations };
+
+
+        // if ( startLocation && destinations.length > 0 && isRoute) {
+        //     try {
+        //         const dataToSend = { startPoint: startLocation, destinations: destinations };
 
 
 
-                fetch(ipAddresRoute, {
-                    method: 'POST',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(dataToSend)
-                })
+        //         fetch(ipAddresRoute, {
+        //             method: 'POST',
+        //             headers: {
+        //                 'Accept': 'application/json',
+        //                 'Content-Type': 'application/json',
+        //             },
+        //             body: JSON.stringify(dataToSend)
+        //         })
 
-                console.log('data that is sent', dataToSend.destinations.length);
-                console.log('data that is sent', dataToSend.startPoint);
-                // isSubmit(false);
-                //    setPolylinePath([]);
-                //    setDeletePath(false);
-                //    setDrawn(false);
-            } catch (error) {
-                // Handle the error
-                console.error('An error occurred:', error.message);
-                // You can also perform additional actions here, such as logging, notifying the user, etc.
-            }
+        //         console.log('data that is sent', dataToSend.destinations.length);
+        //         console.log('data that is sent', dataToSend.startPoint);
+        //         // isSubmit(false);
+        //         //    setPolylinePath([]);
+        //         //    setDeletePath(false);
+        //         //    setDrawn(false);
+        //     } catch (error) {
+        //         // Handle the error
+        //         console.error('An error occurred:', error.message);
+        //         // You can also perform additional actions here, such as logging, notifying the user, etc.
+        //     }
 
-        };
+        // };
     };
 
     useEffect(() => { saveRoute(); }, [isRoute])
@@ -297,9 +315,54 @@ export default function GoogleMap({ searchLocation, setSearchLocation, userLocat
     return (
         <View style={styles.container}>
 
+            <Modal isVisible={toSave} style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <View style={{ backgroundColor: secondaryCol, width: '90%',  padding: 16, borderRadius: '20%' }}>
+                    
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+                        <Text style={{ fontSize: 30, color: primaryCol }}>Select Path to Load</Text>
+                        <TouchableOpacity onPress={() => { isToSave(false)  }}>
+                            <Image
+                                source={require(cancel)}
+                                style={{ height: 30, width: 30 }}
+                            ></Image>
+                        </TouchableOpacity>
+                    </View>
+
+                    <Text style={{
+                        fontSize: 18, color: primaryCol, marginBottom: -10, marginLeft: 8, backgroundColor: secondaryCol, zIndex: 10, width: 58, paddingLeft: 4 }}>Name</Text>
+                    <TextInput
+                        placeholder="Name: max 20 characters"
+                        placeholderTextColor= {accent}
+                        value={inputValue}
+                        onChangeText={handleInputChange}
+                        color= {primaryCol}
+                        style={{
+                            fontSize: 18,
+                            borderWidth: 1,
+                            borderColor: primaryCol,
+                            borderRadius: 5,
+                            padding: 10,
+                            marginBottom: 10,
+                        }}
+                    />
+
+                    <TouchableOpacity onPress={savePath}>
+                        <View style={{
+                            marginBottom: 8, backgroundColor: primaryCol, borderWidth: 1,
+                            borderColor: primaryCol, borderRadius: 5, padding: 10}}>
+                            <Text style={{
+                                fontSize: 18, color: accent
+                            }}>Save Path</Text>
+                        </View>
+                    </TouchableOpacity>
+
+                    
+                </View>
+            </Modal>
+
             <View style={styles.features}>
 
-                <Text style={styles.featureItem}> Status </Text>
+                
                 <Text style={styles.featureItem}> Distance </Text>
                 <Text style={styles.featureItem}> Color </Text>
                 
@@ -322,7 +385,6 @@ export default function GoogleMap({ searchLocation, setSearchLocation, userLocat
                 showsBuildings
                 zoomControlEnabled
                 userInterfaceStyle='dark'
-                
                 showsUserLocation = {true}
                 loadingEnabled={true}
                 showsMyLocationButton
@@ -356,6 +418,7 @@ export default function GoogleMap({ searchLocation, setSearchLocation, userLocat
                         <Marker
                             coordinate={marker}
                             image={require(router)}
+                            style = {{opacity: 0.7}}
                         />
 
                         {startLocation && (

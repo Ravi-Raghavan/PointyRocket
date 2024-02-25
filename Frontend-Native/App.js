@@ -4,7 +4,7 @@ import GoogleMap from './Components/Map';
 import ButtonLayout from './Components/Buttons';
 import { useEffect, useState } from 'react';
 import * as Location from 'expo-location';
-import Modal from "react-native-modal"
+import Modal from "react-native-modal";
 
 
 const primaryCol = '#ED7D31' //'#FFBB64';
@@ -82,6 +82,8 @@ export default function App() {
 
   // closes pop up box
   const [closePopUp, setClosePopUp] = useState(false);
+
+  // const [savePopup, setSavePopUp] = useState(false);
 
   // loaded path to 
   const [newPath, setNewPath] = useState(null);
