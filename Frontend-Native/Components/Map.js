@@ -16,14 +16,17 @@ const primaryCol = '#ED7D31' //'#FFBB64';
 const secondaryCol = '#4F4A45'//'#2D3250';
 const accent = 'white';
 
-const ipAddress = 'https://factual-moved-snapper.ngrok-free.app/submit_path';
+const ipAddressDraw = 'https://factual-moved-snapper.ngrok-free.app/submit_path';
 const ipAddressSave = 'https://factual-moved-snapper.ngrok-free.app/save_data';
-const ipAddresRoute = 'https://factual-moved-snapper.ngrok-free.app/traveling_salesman';
+const ipAddressRoute = 'https://factual-moved-snapper.ngrok-free.app/traveling_salesman';
 
 const routerRange = 94 // meters
 
+
+const origin = '../assets/start.png';
 const router = '../assets/router.png'; // 64px
 const cancel = '../assets/cancel.png';
+const checkmark = '../assets/destinations.png';
 
 export default function GoogleMap({ searchLocation, setSearchLocation, userLocation,
     marker, setMarker,
@@ -37,6 +40,9 @@ export default function GoogleMap({ searchLocation, setSearchLocation, userLocat
     isStartLoc, isDestination,
     isRoute, setRoute,
     newPath, setNewPath,
+    setStartLocationBoolean,
+    setStopsAdded,
+    deleteTravelSalesman, setDeleteTravelSalesman
  }) {
 
     const mapRef = useRef(null);
@@ -136,13 +142,15 @@ export default function GoogleMap({ searchLocation, setSearchLocation, userLocat
         else if (marker && isStartLoc){
             const { coordinate } = event.nativeEvent;
             setStartLocation(coordinate);
+            setStartLocationBoolean(true);
         }
 
         // have to ensure start locaiton added
         else if (marker && startLocation && isDestination) {
             const { coordinate } = event.nativeEvent;
             setDestinations([...destinations, coordinate]);
-            console.log('total', destinations.length);
+            setStopsAdded(true);
+            console.log('total destinations added', destinations.length);
         };
 
     };
@@ -154,10 +162,37 @@ export default function GoogleMap({ searchLocation, setSearchLocation, userLocat
             setRemovePin(false);
             setPolylinePath([]);
             setDrawn(false);
+
+            setStartLocation(null);
+            setStartLocationBoolean(false);
+            setStopsAdded(false);
+            setDestinations([]);
+
         }
     };
 
-    useEffect(() => {removeMarker();}, [removePin]);
+    
+
+    //  * removes origin and destination markers if possible
+    const removeOriginAndDestination = () => {
+        if (deleteTravelSalesman && destinations) {
+ 
+                setStartLocation(null);
+                setStartLocationBoolean(false);
+                setDestinations([]);
+                setStopsAdded(false);
+                setDeleteTravelSalesman(false);
+            
+        };
+            
+            
+           
+    };
+
+    
+
+   
+
 
 
     // * draws path
@@ -183,7 +218,7 @@ export default function GoogleMap({ searchLocation, setSearchLocation, userLocat
         }
     };
 
-    useEffect(() => { deletePolyPath(); }, [deletePath]);
+    
 
     // * adds loaded path
     const addLoadedPath = () => {
@@ -197,53 +232,69 @@ export default function GoogleMap({ searchLocation, setSearchLocation, userLocat
         }
     };
 
-    useEffect(() => { addLoadedPath(); }, [newPath, ]);
+    
 
 
 
     // * when submitting file
+    // submits either drawn path or travel salesman markers
     const submitPath = () => {
+
+        // drawn path to backend
+        if (submit && polylinePath){
+            const data = { center: marker ,route : polylinePath };
+            
+            try {
+                fetch(ipAddressDraw, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                })
+
+                console.assert('Data is sent');
+            }
+            catch (error){
+                console.error('An error occurred during drawing submission:', error.message);
+            }
+
+            
+            isSubmit(false);
+
+        } 
+
+        // travel salesman markers to backend
+        else if ( isRoute && startLocation && destinations) {
+            const data = { center: marker, startPoint: startLocation, stops: destinations };
         
-        if(polylinePath && submit){
-          
-           try{ 
-               const dataToSend = { path: polylinePath };
-
-               
-
-               fetch(ipAddress, {
-                   method: 'POST',
-                   headers: {
-                       'Accept': 'application/json',
-                       'Content-Type': 'application/json',
-                   },
-                   body: JSON.stringify({ path: polylinePath })
-               })
-
-               console.log('data that is sent', dataToSend.path.length);
-               isSubmit(false);
-            //    setPolylinePath([]);
-            //    setDeletePath(false);
-            //    setDrawn(false);
-           } catch (error) {
-               // Handle the error
-               console.error('An error occurred:', error.message);
-               // You can also perform additional actions here, such as logging, notifying the user, etc.
-           }
-
+            try {
+                fetch(ipAddressRoute, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                })
+                console.log('Data is sent');
+            }
+            catch (error) {
+                console.error('An error occurred during travel salesman submission:', error.message);
+            }
+            removeMarker();
+            setRoute(false);
         };
     };
 
-    useEffect(() => { submitPath(); }, [submit])
-
-
-
     // * when saved button is clicked
+    // saves only drawn path
     const savePath = () => {
 
         if (polylinePath && inputValue) {
 
-            data = {
+            const data = {
                 name: inputValue,
                 center: marker,
                 route: polylinePath
@@ -254,6 +305,7 @@ export default function GoogleMap({ searchLocation, setSearchLocation, userLocat
             setInputValue(''); // CLEARS input
 
             console.log('data that is saved', data.name);
+            console.log('length of path', data.route.length);
           
             try {     
                 fetch(ipAddressSave, {
@@ -264,53 +316,19 @@ export default function GoogleMap({ searchLocation, setSearchLocation, userLocat
                     },
                     body: JSON.stringify(data)
                 })
-
-                // isToSave(false);
             } catch (error) {
-                console.error('An error occurred:', error.message);
+                console.error('An error occurred during saving:', error.message);
              }
 
         };
     };
 
-    // useEffect(() => { savePath(); }, [toSave])
+    useEffect(() => { removeMarker(); }, [removePin]);
+    useEffect(() => { removeOriginAndDestination(); }, [deleteTravelSalesman]);
+    useEffect(() => { deletePolyPath(); }, [deletePath]);
+    useEffect(() => { addLoadedPath(); }, [newPath]);
+    useEffect(() => { submitPath(); }, [submit, isRoute])
 
-
-    // * saves route to backend
-    const saveRoute = () => {
-
-
-        // if ( startLocation && destinations.length > 0 && isRoute) {
-        //     try {
-        //         const dataToSend = { startPoint: startLocation, destinations: destinations };
-
-
-
-        //         fetch(ipAddresRoute, {
-        //             method: 'POST',
-        //             headers: {
-        //                 'Accept': 'application/json',
-        //                 'Content-Type': 'application/json',
-        //             },
-        //             body: JSON.stringify(dataToSend)
-        //         })
-
-        //         console.log('data that is sent', dataToSend.destinations.length);
-        //         console.log('data that is sent', dataToSend.startPoint);
-        //         // isSubmit(false);
-        //         //    setPolylinePath([]);
-        //         //    setDeletePath(false);
-        //         //    setDrawn(false);
-        //     } catch (error) {
-        //         // Handle the error
-        //         console.error('An error occurred:', error.message);
-        //         // You can also perform additional actions here, such as logging, notifying the user, etc.
-        //     }
-
-        // };
-    };
-
-    useEffect(() => { saveRoute(); }, [isRoute])
 
     return (
         <View style={styles.container}>
@@ -401,8 +419,7 @@ export default function GoogleMap({ searchLocation, setSearchLocation, userLocat
                             <Polyline
                                 coordinates={polylinePath}
                                 strokeColor={'#ED7D31'}
-                                strokeWidth={2}
-                                style = {{opacity: drawPath? 1 : 0.3}}
+                                strokeWidth={1.5}
                                 
                             />
                         )}
@@ -418,13 +435,13 @@ export default function GoogleMap({ searchLocation, setSearchLocation, userLocat
                         <Marker
                             coordinate={marker}
                             image={require(router)}
-                            style = {{opacity: 0.7}}
+                            style = {{opacity: 1}}
                         />
 
                         {startLocation && (
                             <Marker
                                 coordinate={startLocation}
-                                image={require('../assets/start.png')}
+                                image={require(origin)}
                             />
                         )}
 
@@ -432,6 +449,7 @@ export default function GoogleMap({ searchLocation, setSearchLocation, userLocat
                             <Marker
                                 key={index} // Make sure to set a unique key for each marker
                                 coordinate={destination}
+                                image={require(checkmark)}
                                 
                             />
                         ))}

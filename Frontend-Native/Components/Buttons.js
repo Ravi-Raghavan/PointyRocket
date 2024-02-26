@@ -12,23 +12,26 @@ const save = '../assets/save.png';
 const open = '../assets/open.png';
 const origin = '../assets/track.png';
 const stops = '../assets/sign.png';
+const backspace = '../assets/backspace.png';
 
 // colors for UI
 const primaryCol = '#ED7D31' //'#FFBB64';
 const secondaryCol = '#4F4A45'//'#2D3250';
 const accent = 'white';
 const toggle = '#005B41';
-const sent = '#232D3F';
+const alert = '#D2042D';
 
 
 // screen dimensions
 const { width } = Dimensions.get('window');
 
 const ButtonLayout = ({ marker, addPin, setAddPin, setRemovePin, drawPath, setDrawPath, setDeletePath, drawn, isSubmit, isToSave,
-    setIsStartLoc, setIsDestination, setRoute, setClosePopUp }) =>{
+    setIsStartLoc, setIsDestination, setRoute, setClosePopUp, startLocationBoolean, stopsAdded, setDeleteTravelSalesman }) =>{
 
     const [addtoggled, isAddToggled] = useState(false);
     const [drawtoggled, isDrawToggled] = useState(false);
+    const [originToggle, setOriginToggle] = useState(false);
+    const [stopToggle, setStopToggle] = useState(false);
 
     // * add button
     const handleAddPin = () => {
@@ -55,11 +58,22 @@ const ButtonLayout = ({ marker, addPin, setAddPin, setRemovePin, drawPath, setDr
         
     };
 
+    // * deletes origin and destination markers
+    const handleDeleteOriginAndDesMarkers = () => {
+        if (startLocationBoolean) {
+            setDeleteTravelSalesman(true);
+        };
+    };
+
     // * submit button
     const handleSubmit = () => {
         if (drawn) {
             isSubmit(true);
-        }
+        } 
+
+        else if (stopsAdded) {
+            setRoute(true);
+        };
     };
 
 
@@ -67,7 +81,7 @@ const ButtonLayout = ({ marker, addPin, setAddPin, setRemovePin, drawPath, setDr
     const handleSave = () => {
         if (drawn) {
             isToSave(true);
-        }
+        };
     };
     
     // * load path button
@@ -77,21 +91,16 @@ const ButtonLayout = ({ marker, addPin, setAddPin, setRemovePin, drawPath, setDr
 
     // * adds start location
     const handleStartLocation = () => {
-        setIsStartLoc(prev => !prev);;
+        setIsStartLoc(prev => !prev);
+        setOriginToggle(prev => !prev);
     };
 
 
     // * adds destinations stops setting boolean to true
     const handleDestinations = () => {
         setIsDestination(prev => !prev);
+        setStopToggle(prev => !prev);
     };
-
-    const handleRoute = () => {
-        setRoute(true);
-    };
-
-
-    
 
     return (
         <>
@@ -121,7 +130,7 @@ const ButtonLayout = ({ marker, addPin, setAddPin, setRemovePin, drawPath, setDr
 
                     <TouchableOpacity disabled={drawPath || !marker} onPress={handleClearPin}>
 
-                        <View style={btnStyle.ImageContainer}>
+                        <View style={btnStyle.deleteImageContainer}>
                             <Image
                                 source={require(removePin)}
                                 style={btnStyle.image}
@@ -136,9 +145,9 @@ const ButtonLayout = ({ marker, addPin, setAddPin, setRemovePin, drawPath, setDr
 
                 </View>
 
-                <View style={[btnStyle.btnFrame, addPin || !marker ? btnStyle.inactive : null]} >
+                <View style={[btnStyle.btnFrame, addPin || !marker || startLocationBoolean || originToggle ? btnStyle.inactive : null]} >
 
-                    <TouchableOpacity disabled={addPin || !marker} onPress={handleDrawPath}>
+                    <TouchableOpacity disabled={addPin || !marker || startLocationBoolean || originToggle} onPress={handleDrawPath}>
 
                         <View style={[btnStyle.ImageContainer, drawtoggled ? { backgroundColor: toggle } : null]}>
                             <Image
@@ -159,7 +168,7 @@ const ButtonLayout = ({ marker, addPin, setAddPin, setRemovePin, drawPath, setDr
 
                     <TouchableOpacity disabled={!drawn} onPress={handleDeletePath}>
 
-                        <View style={btnStyle.ImageContainer}>
+                        <View style={btnStyle.deleteImageContainer}>
                             <Image
                                 source={require(deletePath)}
                                 style={btnStyle.image}
@@ -174,11 +183,11 @@ const ButtonLayout = ({ marker, addPin, setAddPin, setRemovePin, drawPath, setDr
 
                 </View>
 
-                <View style={btnStyle.btnFrame} >
+                <View style={[btnStyle.btnFrame, addPin || !marker || drawtoggled || drawn || stopToggle ? btnStyle.inactive : null]} >
 
-                    <TouchableOpacity onPress={handleStartLocation}>
+                    <TouchableOpacity disabled={addPin || !marker || drawtoggled || drawn || stopToggle} onPress={handleStartLocation}>
 
-                        <View style={btnStyle.ImageContainer}>
+                        <View style={[btnStyle.ImageContainer, originToggle ? { backgroundColor: toggle } : null]}>
                             <Image
                                 source={require(origin)}
                                 style={btnStyle.image}
@@ -194,11 +203,11 @@ const ButtonLayout = ({ marker, addPin, setAddPin, setRemovePin, drawPath, setDr
                 </View>
 
 
-                <View style={btnStyle.btnFrame} >
+                <View style={[btnStyle.btnFrame, !startLocationBoolean || originToggle  ? btnStyle.inactive : null]} >
 
-                    <TouchableOpacity onPress={handleDestinations}>
+                    <TouchableOpacity disabled={!startLocationBoolean || originToggle} onPress={handleDestinations}>
 
-                        <View style={btnStyle.ImageContainer}>
+                        <View style={[btnStyle.ImageContainer, stopToggle ? { backgroundColor: toggle } : null]}>
                             <Image
                                 source={require(stops)}
                                 style={btnStyle.image}
@@ -213,9 +222,28 @@ const ButtonLayout = ({ marker, addPin, setAddPin, setRemovePin, drawPath, setDr
 
                 </View>
 
-                <View style={[btnStyle.btnFrame, !drawn ? btnStyle.inactive : null]} >
+                <View style={[btnStyle.btnFrame, !startLocationBoolean || stopToggle ? btnStyle.inactive : null]} >
 
-                    <TouchableOpacity disabled={!drawn} onPress={handleSubmit}>
+                    <TouchableOpacity disabled={!startLocationBoolean || stopToggle} onPress={handleDeleteOriginAndDesMarkers}>
+
+                        <View style={btnStyle.deleteImageContainer}>
+                            <Image
+                                source={require(backspace)}
+                                style={btnStyle.image}
+                            />
+                        </View>
+                    </TouchableOpacity>
+
+                    <View style={btnStyle.textContainer}>
+                        <Text style={btnStyle.text}>Delete</Text>
+                    </View>
+
+
+                </View>
+
+                <View style={[btnStyle.btnFrame, !drawn && !stopsAdded || drawtoggled || stopToggle ? btnStyle.inactive : null]} >
+
+                    <TouchableOpacity disabled={!drawn && !stopsAdded || drawtoggled || stopToggle} onPress={handleSubmit}>
 
                         <View style={btnStyle.ImageContainer}>
                             <Image
@@ -232,9 +260,9 @@ const ButtonLayout = ({ marker, addPin, setAddPin, setRemovePin, drawPath, setDr
 
                 </View>
 
-                <View style={[btnStyle.btnFrame, !drawn ? btnStyle.inactive : null]} >
+                <View style={[btnStyle.btnFrame, !drawn || drawtoggled? btnStyle.inactive : null]} >
 
-                    <TouchableOpacity disabled={!drawn} onPress={handleSave}>
+                    <TouchableOpacity disabled={!drawn || drawtoggled} onPress={handleSave}>
 
                         <View style={btnStyle.ImageContainer}>
                             <Image
@@ -291,9 +319,6 @@ const btnStyle  = StyleSheet.create({
         backgroundColor: secondaryCol,
     },
 
-    pressed: {
-        backgroundColor: sent,
-    },
 
     btnLayer: {
         width: '100%',
@@ -320,6 +345,14 @@ const btnStyle  = StyleSheet.create({
         borderColor: accent,
         borderWidth: 2,
         
+    },
+
+    deleteImageContainer: {
+        padding: 8, // Adjust padding as needed
+        borderRadius: 10, // Adjust border radius as needed
+        borderColor: accent,
+        borderWidth: 2,
+        backgroundColor: alert
     },
 
     image: { height: 30, width: 30 },

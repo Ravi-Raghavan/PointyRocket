@@ -7,57 +7,63 @@ import * as Location from 'expo-location';
 import Modal from "react-native-modal";
 
 
+//  colors
 const primaryCol = '#ED7D31' //'#FFBB64';
 const secondaryCol = '#4F4A45'//'#2D3250';
 const accent = 'white';
 
+
+// image locations
 const cancel = './assets/cancel.png';
 
 // sample path saved
-const samplePathSaved = [ 
-  {
-    name: 'sample path 1',
-    center: { "latitude": 48.85500355546955, "longitude": 2.2924003599834566 },
-    route: [{ "latitude": 48.85500355546955, "longitude": 2.2924003599834566 }, { "latitude": 48.85500355546955, "longitude": 2.292301929731117 }, { "latitude": 48.85500355546955, "longitude": 2.292301929731117 }, { "latitude": 48.85501704797608, "longitude": 2.2921829933012074 }, { "latitude": 48.85503863595429, "longitude": 2.2920763604652126 }, { "latitude": 48.85506292237231, "longitude": 2.2919861327964273 }, { "latitude": 48.85509800269194, "longitude": 2.2919205125029465 }, { "latitude": 48.8551357815557, "longitude": 2.2918794999603307 }, { "latitude": 48.85517625883399, "longitude": 2.2918548923972457 }, { "latitude": 48.855192449736165, "longitude": 2.291846689813692 }],
+// const samplePathSaved = [ 
+//   {
+//     name: 'sample path 1',
+//     center: { "latitude": 48.85500355546955, "longitude": 2.2924003599834566 },
+//     route: [{ "latitude": 48.85500355546955, "longitude": 2.2924003599834566 }, { "latitude": 48.85500355546955, "longitude": 2.292301929731117 }, { "latitude": 48.85500355546955, "longitude": 2.292301929731117 }, { "latitude": 48.85501704797608, "longitude": 2.2921829933012074 }, { "latitude": 48.85503863595429, "longitude": 2.2920763604652126 }, { "latitude": 48.85506292237231, "longitude": 2.2919861327964273 }, { "latitude": 48.85509800269194, "longitude": 2.2919205125029465 }, { "latitude": 48.8551357815557, "longitude": 2.2918794999603307 }, { "latitude": 48.85517625883399, "longitude": 2.2918548923972457 }, { "latitude": 48.855192449736165, "longitude": 2.291846689813692 }],
 
-  },
+//   },
 
-  {
-    name: 'sample path 2',
-    center: { "latitude": 48.85500355546955, "longitude": 2.2924003599834566 },
-    route: [{ "latitude": 50, "longitude": 2.2924003599834566 }, { "latitude": 48.85500355546955, "longitude": 2.292301929731117 }, { "latitude": 48.85500355546955, "longitude": 2.292301929731117 }, { "latitude": 48.85501704797608, "longitude": 2.2921829933012074 }, { "latitude": 48.85503863595429, "longitude": 2.2920763604652126 }, { "latitude": 48.85506292237231, "longitude": 2.2919861327964273 }, { "latitude": 48.85509800269194, "longitude": 2.2919205125029465 }, { "latitude": 48.8551357815557, "longitude": 2.2918794999603307 }, { "latitude": 48.85517625883399, "longitude": 2.2918548923972457 }, { "latitude": 48.855192449736165, "longitude": 2.291846689813692 }],
+//   {
+//     name: 'sample path 2',
+//     center: { "latitude": 48.85500355546955, "longitude": 2.2924003599834566 },
+//     route: [{ "latitude": 50, "longitude": 2.2924003599834566 }, { "latitude": 48.85500355546955, "longitude": 2.292301929731117 }, { "latitude": 48.85500355546955, "longitude": 2.292301929731117 }, { "latitude": 48.85501704797608, "longitude": 2.2921829933012074 }, { "latitude": 48.85503863595429, "longitude": 2.2920763604652126 }, { "latitude": 48.85506292237231, "longitude": 2.2919861327964273 }, { "latitude": 48.85509800269194, "longitude": 2.2919205125029465 }, { "latitude": 48.8551357815557, "longitude": 2.2918794999603307 }, { "latitude": 48.85517625883399, "longitude": 2.2918548923972457 }, { "latitude": 48.855192449736165, "longitude": 2.291846689813692 }],
 
-  },
+//   },
 
-   {
-    name: 'sample path 1',
-    center: { "latitude": 48.85500355546955, "longitude": 2.2924003599834566 },
-    route: [{ "latitude": 48.85500355546955, "longitude": 2.2924003599834566 }, { "latitude": 48.85500355546955, "longitude": 2.292301929731117 }, { "latitude": 48.85500355546955, "longitude": 2.292301929731117 }, { "latitude": 48.85501704797608, "longitude": 2.2921829933012074 }, { "latitude": 48.85503863595429, "longitude": 2.2920763604652126 }, { "latitude": 48.85506292237231, "longitude": 2.2919861327964273 }, { "latitude": 48.85509800269194, "longitude": 2.2919205125029465 }, { "latitude": 48.8551357815557, "longitude": 2.2918794999603307 }, { "latitude": 48.85517625883399, "longitude": 2.2918548923972457 }, { "latitude": 48.855192449736165, "longitude": 2.291846689813692 }],
+//    {
+//     name: 'sample path 1',
+//     center: { "latitude": 48.85500355546955, "longitude": 2.2924003599834566 },
+//     route: [{ "latitude": 48.85500355546955, "longitude": 2.2924003599834566 }, { "latitude": 48.85500355546955, "longitude": 2.292301929731117 }, { "latitude": 48.85500355546955, "longitude": 2.292301929731117 }, { "latitude": 48.85501704797608, "longitude": 2.2921829933012074 }, { "latitude": 48.85503863595429, "longitude": 2.2920763604652126 }, { "latitude": 48.85506292237231, "longitude": 2.2919861327964273 }, { "latitude": 48.85509800269194, "longitude": 2.2919205125029465 }, { "latitude": 48.8551357815557, "longitude": 2.2918794999603307 }, { "latitude": 48.85517625883399, "longitude": 2.2918548923972457 }, { "latitude": 48.855192449736165, "longitude": 2.291846689813692 }],
 
-  },
+//   },
 
-  {
-    name: 'sample path 2',
-    center: { "latitude": 48.85500355546955, "longitude": 2.2924003599834566 },
-    route: [{ "latitude": 50, "longitude": 2.2924003599834566 }, { "latitude": 48.85500355546955, "longitude": 2.292301929731117 }, { "latitude": 48.85500355546955, "longitude": 2.292301929731117 }, { "latitude": 48.85501704797608, "longitude": 2.2921829933012074 }, { "latitude": 48.85503863595429, "longitude": 2.2920763604652126 }, { "latitude": 48.85506292237231, "longitude": 2.2919861327964273 }, { "latitude": 48.85509800269194, "longitude": 2.2919205125029465 }, { "latitude": 48.8551357815557, "longitude": 2.2918794999603307 }, { "latitude": 48.85517625883399, "longitude": 2.2918548923972457 }, { "latitude": 48.855192449736165, "longitude": 2.291846689813692 }],
+//   {
+//     name: 'sample path 2',
+//     center: { "latitude": 48.85500355546955, "longitude": 2.2924003599834566 },
+//     route: [{ "latitude": 50, "longitude": 2.2924003599834566 }, { "latitude": 48.85500355546955, "longitude": 2.292301929731117 }, { "latitude": 48.85500355546955, "longitude": 2.292301929731117 }, { "latitude": 48.85501704797608, "longitude": 2.2921829933012074 }, { "latitude": 48.85503863595429, "longitude": 2.2920763604652126 }, { "latitude": 48.85506292237231, "longitude": 2.2919861327964273 }, { "latitude": 48.85509800269194, "longitude": 2.2919205125029465 }, { "latitude": 48.8551357815557, "longitude": 2.2918794999603307 }, { "latitude": 48.85517625883399, "longitude": 2.2918548923972457 }, { "latitude": 48.855192449736165, "longitude": 2.291846689813692 }],
 
-  },
+//   },
 
-   {
-    name: 'sample path 3',
-     center: { "latitude": 48.85500355546955, "longitude": 2.2924003599834566 },
-    route: [{ "latitude": 48.85500355546955, "longitude": 2.2924003599834566 }, { "latitude": 48.85500355546955, "longitude": 2.292301929731117 }, { "latitude": 48.85500355546955, "longitude": 2.292301929731117 }, { "latitude": 48.85501704797608, "longitude": 2.2921829933012074 }, { "latitude": 48.85503863595429, "longitude": 2.2920763604652126 }, { "latitude": 48.85506292237231, "longitude": 2.2919861327964273 }, { "latitude": 48.85509800269194, "longitude": 2.2919205125029465 }, { "latitude": 48.8551357815557, "longitude": 2.2918794999603307 }, { "latitude": 48.85517625883399, "longitude": 2.2918548923972457 }, { "latitude": 48.855192449736165, "longitude": 2.291846689813692 }],
+//    {
+//     name: 'sample path 3',
+//      center: { "latitude": 48.85500355546955, "longitude": 2.2924003599834566 },
+//     route: [{ "latitude": 48.85500355546955, "longitude": 2.2924003599834566 }, { "latitude": 48.85500355546955, "longitude": 2.292301929731117 }, { "latitude": 48.85500355546955, "longitude": 2.292301929731117 }, { "latitude": 48.85501704797608, "longitude": 2.2921829933012074 }, { "latitude": 48.85503863595429, "longitude": 2.2920763604652126 }, { "latitude": 48.85506292237231, "longitude": 2.2919861327964273 }, { "latitude": 48.85509800269194, "longitude": 2.2919205125029465 }, { "latitude": 48.8551357815557, "longitude": 2.2918794999603307 }, { "latitude": 48.85517625883399, "longitude": 2.2918548923972457 }, { "latitude": 48.855192449736165, "longitude": 2.291846689813692 }],
 
-  },
+//   },
 
-  {
-    name: 'sample path 4',
-    center: { "latitude": 48.85500355546955, "longitude": 2.2924003599834566 },
-    route: [{ "latitude": 50, "longitude": 2.2924003599834566 }, { "latitude": 48.85500355546955, "longitude": 2.292301929731117 }, { "latitude": 48.85500355546955, "longitude": 2.292301929731117 }, { "latitude": 48.85501704797608, "longitude": 2.2921829933012074 }, { "latitude": 48.85503863595429, "longitude": 2.2920763604652126 }, { "latitude": 48.85506292237231, "longitude": 2.2919861327964273 }, { "latitude": 48.85509800269194, "longitude": 2.2919205125029465 }, { "latitude": 48.8551357815557, "longitude": 2.2918794999603307 }, { "latitude": 48.85517625883399, "longitude": 2.2918548923972457 }, { "latitude": 48.855192449736165, "longitude": 2.291846689813692 }],
+//   {
+//     name: 'sample path 4',
+//     center: { "latitude": 48.85500355546955, "longitude": 2.2924003599834566 },
+//     route: [{ "latitude": 50, "longitude": 2.2924003599834566 }, { "latitude": 48.85500355546955, "longitude": 2.292301929731117 }, { "latitude": 48.85500355546955, "longitude": 2.292301929731117 }, { "latitude": 48.85501704797608, "longitude": 2.2921829933012074 }, { "latitude": 48.85503863595429, "longitude": 2.2920763604652126 }, { "latitude": 48.85506292237231, "longitude": 2.2919861327964273 }, { "latitude": 48.85509800269194, "longitude": 2.2919205125029465 }, { "latitude": 48.8551357815557, "longitude": 2.2918794999603307 }, { "latitude": 48.85517625883399, "longitude": 2.2918548923972457 }, { "latitude": 48.855192449736165, "longitude": 2.291846689813692 }],
 
-  }
-];
+//   }
+// ];
 
+const samplePathSved = [];
+
+const load_url = 'https://api.example.com/data';
 
 export default function App() {
 
@@ -68,13 +74,21 @@ export default function App() {
   const [drawn, setDrawn] = useState(false);
   const [searchLocation, setSearchLocation] = useState(null);
   const [marker, setMarker] = useState(null);
+  const [startLocationBoolean, setStartLocationBoolean] = useState(false);
   const [userLocation, setUserLocation] = useState(null); // users current location
   const [submit, isSubmit] = useState(false);
   const [toSave, isToSave] = useState(false);
   // const [addStartLoc, setAddStartLoc] = useState([]);
   const  [isStartLoc, setIsStartLoc] = useState(false);
   const [isDestination, setIsDestination] = useState(false);
-  const [isLoad, setIsLoad] = useState(false);
+
+  const [stopsAdded, setStopsAdded] = useState(false); // boolean check for destination  markers
+
+  // loading saved path variable
+  const [savedPath, setSavedPath] = useState([]);
+
+  const [deleteTravelSalesman, setDeleteTravelSalesman] = useState(false); // deals with boolean to check whether to delete the origin and destination markers
+  
 
 
   // submits the route
@@ -83,7 +97,7 @@ export default function App() {
   // closes pop up box
   const [closePopUp, setClosePopUp] = useState(false);
 
-  // const [savePopup, setSavePopUp] = useState(false);
+
 
   // loaded path to 
   const [newPath, setNewPath] = useState(null);
@@ -93,6 +107,31 @@ export default function App() {
     setNewPath(obj);
     console.log('Test');
   }
+
+  // fetch data from mongoDB to extract saved paths
+  const handleLoadingPaths = () => {
+    if(closePopUp) {
+      console.log('loading path');
+      try {
+        const response = fetch(load_url);
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data = response.json();
+        // Handle the data received from the API
+        setSavedPath(data);
+      } catch (error) {
+        // Handle errors
+        console.error('There was a problem with the fetch operation:', error);
+      }
+
+    };
+  };
+
+  useEffect( () => {
+    handleLoadingPaths();
+    
+  }, [closePopUp]);
 
 
   async function requestPermission() {
@@ -135,7 +174,7 @@ export default function App() {
 
           <ScrollView>
 
-            {samplePathSaved.map((item, index) => (
+            {savedPath && savedPath.map((item, index) => (
 
               <TouchableOpacity onPress={ () => newPathObject(item)}>
                 <View key={index} style={{ backgroundColor: primaryCol, padding: 8, borderRadius: 10, marginBottom: 8 }} >
@@ -193,6 +232,10 @@ export default function App() {
           setRoute={setRoute}
           newPath={newPath}
           setNewPath={setNewPath}
+          setStartLocationBoolean={setStartLocationBoolean}
+          setStopsAdded={setStopsAdded}
+          deleteTravelSalesman={deleteTravelSalesman}
+          setDeleteTravelSalesman={setDeleteTravelSalesman}
           
         />
       </View>
@@ -214,6 +257,9 @@ export default function App() {
           setIsDestination={setIsDestination}
           setRoute={setRoute}
           setClosePopUp={setClosePopUp}
+          startLocationBoolean={startLocationBoolean}
+          stopsAdded={stopsAdded}
+          setDeleteTravelSalesman={setDeleteTravelSalesman}
           />
         </View> 
   
@@ -234,7 +280,8 @@ const styles = StyleSheet.create({
     // height: '12%',
     flex: 1,
     flexDirection: 'row',
-    padding: 16,
+    paddingTop: 16,
+    paddingHorizontal: 8,
     justifyContent: 'space-between',
     alignItems: 'center'
 
@@ -247,7 +294,8 @@ const styles = StyleSheet.create({
 
   logo_img: {
     width: 30, 
-    height: 30, 
+    height: 30,
+    opacity: 0.9 
   },
 
   mapBox: {
