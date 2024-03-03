@@ -9,7 +9,7 @@ app = Flask(__name__)
 CORS(app, origin = 'http://localhost:8000', resources={r"/*": {"origins": "*"}})
 
 #MongoDB Information
-uri = "mongodb+srv://raviraghavan:gnGgV5YnXLFrYXJ7@capstone.fj6fsut.mongodb.net/?retryWrites=true&w=majority"
+uri = "mongodb+srv://raviraghavan:gnGgV5YnXLFrYXJ7@capstone.fj6fsut.mongodb.net/?retryWrites=true&w=majority&appName=Capstone"
 
 # Create a new client and connect to the server
 client = MongoClient(uri)
