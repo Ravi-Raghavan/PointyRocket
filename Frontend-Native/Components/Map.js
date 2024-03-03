@@ -17,10 +17,10 @@ const secondaryCol = '#4F4A45'//'#2D3250';
 const accent = 'white';
 
 const ipAddressDraw = 'https://factual-moved-snapper.ngrok-free.app/submit_path';
-const ipAddressSave = 'https://factual-moved-snapper.ngrok-free.app/save_data';
 const ipAddressRoute = 'https://factual-moved-snapper.ngrok-free.app/traveling_salesman';
+const ipAddressSave = 'https://factual-moved-snapper.ngrok-free.app/save_data';
 
-const routerRange = 94 // meters
+const routerRange = 100 // meters
 
 
 const origin = '../assets/start.png';

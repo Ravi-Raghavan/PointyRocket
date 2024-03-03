@@ -17,7 +17,7 @@ const accent = 'white';
 const cancel = './assets/cancel.png';
 
 // urls to fetch data from backen
-const load_url = 'https://factual-moved-snapper.ngrok-free.app/submit_path';
+const load_url = 'https://factual-moved-snapper.ngrok-free.app/load_paths';
 
 export default function App() {
 
@@ -61,7 +61,7 @@ export default function App() {
   const [stopsAdded, setStopsAdded] = useState(false); 
 
   // loading saved path variable
-  const [savedPath, setSavedPath] = useState([]);
+  const [savedPath, setSavedPath] = useState(null);
 
   // deals with boolean to check whether to delete the origin and destination markers
   const [deleteTravelSalesman, setDeleteTravelSalesman] = useState(false); 
@@ -82,18 +82,18 @@ export default function App() {
   }
 
   // fetch data from mongoDB to extract saved paths
-  const handleLoadingPaths = () => {
+  const handleLoadingPaths = async () => {
     if(closePopUp) {
       try {
-        const response = fetch(load_url);
+        const response = await fetch(load_url);
         if (!response.ok) {
           throw new Error('COULD NOT FIND THE URL');
           
         } 
         else {
-          const data = response.json();
+          const data = await response.json();
           setSavedPath(data);
-          console.warn('TESTING: structure of data loaded', data);
+          // console.log('TESTING: structure of data loaded', JSON.stringify(data));
         };
         
       } catch (error) {
@@ -105,11 +105,11 @@ export default function App() {
   };
 
   useEffect( () => {
-    handleLoadingPaths();
-    
+    if(closePopUp) {
+      handleLoadingPaths();
+      console.log(savedPath[0].name);
+    };
   }, [closePopUp]);
-
-
 
   async function requestPermission() {
     const {status} = await Location.requestForegroundPermissionsAsync();
@@ -149,12 +149,12 @@ export default function App() {
 
           {/* layout for a path */}
 
-          {/*<ScrollView>
+          <ScrollView>
 
             {savedPath && savedPath.map((item, index) => (
 
               <TouchableOpacity onPress={ () => newPathObject(item)}>
-                <View key={index} style={{ backgroundColor: primaryCol, padding: 8, borderRadius: 10, marginBottom: 8 }} >
+                <View key={item.name} style={{ backgroundColor: primaryCol, padding: 8, borderRadius: 10, marginBottom: 8 }} >
                   <Text style={{ fontSize: 24, color: accent }}>{item.name} </Text>
 
                   <Text style={{ fontSize: 14, color: accent }}>Center Coordinate: ({item.center.latitude}, {item.center.longitude})</Text>
@@ -165,7 +165,7 @@ export default function App() {
               
             ))}
 
-          </ScrollView>*/}
+          </ScrollView>
         </View>
       </Modal>
 
