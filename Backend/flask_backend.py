@@ -69,8 +69,25 @@ def save_data():
             print("Pinged your deployment. You successfully connected to MongoDB!")
         except Exception as e:
             print(e)
+        
+        data = request.get_json()
+        print("Data Received: ", data) 
     
         # Get the current length of the list containing documents
+        most_recent_path = r.get("path_counter")
+        if most_recent_path is not None:
+            most_recent_path = int(most_recent_path)
+        else:
+            r.set("path_counter", 0)
+            most_recent_path = 0
+        
+        # Store Data in Redis
+        key = r.incr("path_counter")
+        path_data = json.dumps(data)
+        r.set(f"path:{key}", path_data)
+        r.rpush("path_list", key)
+        
+         # Get the current length of the list containing documents
         most_recent_path = r.get("path_counter")
         if most_recent_path is not None:
             most_recent_path = int(most_recent_path)
