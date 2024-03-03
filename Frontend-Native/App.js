@@ -16,93 +16,66 @@ const accent = 'white';
 // image locations
 const cancel = './assets/cancel.png';
 
-// sample path saved
-// const samplePathSaved = [ 
-//   {
-//     name: 'sample path 1',
-//     center: { "latitude": 48.85500355546955, "longitude": 2.2924003599834566 },
-//     route: [{ "latitude": 48.85500355546955, "longitude": 2.2924003599834566 }, { "latitude": 48.85500355546955, "longitude": 2.292301929731117 }, { "latitude": 48.85500355546955, "longitude": 2.292301929731117 }, { "latitude": 48.85501704797608, "longitude": 2.2921829933012074 }, { "latitude": 48.85503863595429, "longitude": 2.2920763604652126 }, { "latitude": 48.85506292237231, "longitude": 2.2919861327964273 }, { "latitude": 48.85509800269194, "longitude": 2.2919205125029465 }, { "latitude": 48.8551357815557, "longitude": 2.2918794999603307 }, { "latitude": 48.85517625883399, "longitude": 2.2918548923972457 }, { "latitude": 48.855192449736165, "longitude": 2.291846689813692 }],
-
-//   },
-
-//   {
-//     name: 'sample path 2',
-//     center: { "latitude": 48.85500355546955, "longitude": 2.2924003599834566 },
-//     route: [{ "latitude": 50, "longitude": 2.2924003599834566 }, { "latitude": 48.85500355546955, "longitude": 2.292301929731117 }, { "latitude": 48.85500355546955, "longitude": 2.292301929731117 }, { "latitude": 48.85501704797608, "longitude": 2.2921829933012074 }, { "latitude": 48.85503863595429, "longitude": 2.2920763604652126 }, { "latitude": 48.85506292237231, "longitude": 2.2919861327964273 }, { "latitude": 48.85509800269194, "longitude": 2.2919205125029465 }, { "latitude": 48.8551357815557, "longitude": 2.2918794999603307 }, { "latitude": 48.85517625883399, "longitude": 2.2918548923972457 }, { "latitude": 48.855192449736165, "longitude": 2.291846689813692 }],
-
-//   },
-
-//    {
-//     name: 'sample path 1',
-//     center: { "latitude": 48.85500355546955, "longitude": 2.2924003599834566 },
-//     route: [{ "latitude": 48.85500355546955, "longitude": 2.2924003599834566 }, { "latitude": 48.85500355546955, "longitude": 2.292301929731117 }, { "latitude": 48.85500355546955, "longitude": 2.292301929731117 }, { "latitude": 48.85501704797608, "longitude": 2.2921829933012074 }, { "latitude": 48.85503863595429, "longitude": 2.2920763604652126 }, { "latitude": 48.85506292237231, "longitude": 2.2919861327964273 }, { "latitude": 48.85509800269194, "longitude": 2.2919205125029465 }, { "latitude": 48.8551357815557, "longitude": 2.2918794999603307 }, { "latitude": 48.85517625883399, "longitude": 2.2918548923972457 }, { "latitude": 48.855192449736165, "longitude": 2.291846689813692 }],
-
-//   },
-
-//   {
-//     name: 'sample path 2',
-//     center: { "latitude": 48.85500355546955, "longitude": 2.2924003599834566 },
-//     route: [{ "latitude": 50, "longitude": 2.2924003599834566 }, { "latitude": 48.85500355546955, "longitude": 2.292301929731117 }, { "latitude": 48.85500355546955, "longitude": 2.292301929731117 }, { "latitude": 48.85501704797608, "longitude": 2.2921829933012074 }, { "latitude": 48.85503863595429, "longitude": 2.2920763604652126 }, { "latitude": 48.85506292237231, "longitude": 2.2919861327964273 }, { "latitude": 48.85509800269194, "longitude": 2.2919205125029465 }, { "latitude": 48.8551357815557, "longitude": 2.2918794999603307 }, { "latitude": 48.85517625883399, "longitude": 2.2918548923972457 }, { "latitude": 48.855192449736165, "longitude": 2.291846689813692 }],
-
-//   },
-
-//    {
-//     name: 'sample path 3',
-//      center: { "latitude": 48.85500355546955, "longitude": 2.2924003599834566 },
-//     route: [{ "latitude": 48.85500355546955, "longitude": 2.2924003599834566 }, { "latitude": 48.85500355546955, "longitude": 2.292301929731117 }, { "latitude": 48.85500355546955, "longitude": 2.292301929731117 }, { "latitude": 48.85501704797608, "longitude": 2.2921829933012074 }, { "latitude": 48.85503863595429, "longitude": 2.2920763604652126 }, { "latitude": 48.85506292237231, "longitude": 2.2919861327964273 }, { "latitude": 48.85509800269194, "longitude": 2.2919205125029465 }, { "latitude": 48.8551357815557, "longitude": 2.2918794999603307 }, { "latitude": 48.85517625883399, "longitude": 2.2918548923972457 }, { "latitude": 48.855192449736165, "longitude": 2.291846689813692 }],
-
-//   },
-
-//   {
-//     name: 'sample path 4',
-//     center: { "latitude": 48.85500355546955, "longitude": 2.2924003599834566 },
-//     route: [{ "latitude": 50, "longitude": 2.2924003599834566 }, { "latitude": 48.85500355546955, "longitude": 2.292301929731117 }, { "latitude": 48.85500355546955, "longitude": 2.292301929731117 }, { "latitude": 48.85501704797608, "longitude": 2.2921829933012074 }, { "latitude": 48.85503863595429, "longitude": 2.2920763604652126 }, { "latitude": 48.85506292237231, "longitude": 2.2919861327964273 }, { "latitude": 48.85509800269194, "longitude": 2.2919205125029465 }, { "latitude": 48.8551357815557, "longitude": 2.2918794999603307 }, { "latitude": 48.85517625883399, "longitude": 2.2918548923972457 }, { "latitude": 48.855192449736165, "longitude": 2.291846689813692 }],
-
-//   }
-// ];
-
-const samplePathSved = [];
-
-const load_url = 'https://api.example.com/data';
+// urls to fetch data from backen
+const load_url = 'https://factual-moved-snapper.ngrok-free.app/submit_path';
 
 export default function App() {
 
+  // boolean to add pin on map
   const [addPin, setAddPin] = useState(false);
+
+  // boolean to remove pin on map
   const [removePin, setRemovePin] = useState(false);
+
+  // boolean to allow drawing
   const [drawPath, setDrawPath] = useState(false);
+
+  // boolean to allow deleting path
   const [deletePath, setDeletePath] = useState(false);
+
+  // boolean to state a path is drawn
   const [drawn, setDrawn] = useState(false);
-  const [searchLocation, setSearchLocation] = useState(null);
+
+  // object of marker coordinates
   const [marker, setMarker] = useState(null);
+
+  // boolean that states start location is added
   const [startLocationBoolean, setStartLocationBoolean] = useState(false);
-  const [userLocation, setUserLocation] = useState(null); // users current location
+
+  // coordinate object to store user current location
+  const [userLocation, setUserLocation] = useState(null); 
+
+  // boolean to allow submit
   const [submit, isSubmit] = useState(false);
+
+  // boolean to allow save
   const [toSave, isToSave] = useState(false);
-  // const [addStartLoc, setAddStartLoc] = useState([]);
+
+  // boolean to allow set a start marker 
   const  [isStartLoc, setIsStartLoc] = useState(false);
+
+  // boolean to set stop markers
   const [isDestination, setIsDestination] = useState(false);
 
-  const [stopsAdded, setStopsAdded] = useState(false); // boolean check for destination  markers
+  // boolean check for at least one destination marker
+  const [stopsAdded, setStopsAdded] = useState(false); 
 
   // loading saved path variable
   const [savedPath, setSavedPath] = useState([]);
 
-  const [deleteTravelSalesman, setDeleteTravelSalesman] = useState(false); // deals with boolean to check whether to delete the origin and destination markers
+  // deals with boolean to check whether to delete the origin and destination markers
+  const [deleteTravelSalesman, setDeleteTravelSalesman] = useState(false); 
   
-
-
   // submits the route
   const [isRoute, setRoute] = useState(false);
 
   // closes pop up box
   const [closePopUp, setClosePopUp] = useState(false);
 
-
-
-  // loaded path to 
+  // loaded path to map
   const [newPath, setNewPath] = useState(null);
 
-  // adds new laoded path as an object
+  // adds new laoded path on the map
   const newPathObject = (obj) => {
     setNewPath(obj);
     console.log('Test');
@@ -111,15 +84,18 @@ export default function App() {
   // fetch data from mongoDB to extract saved paths
   const handleLoadingPaths = () => {
     if(closePopUp) {
-      console.log('loading path');
       try {
         const response = fetch(load_url);
         if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const data = response.json();
-        // Handle the data received from the API
-        setSavedPath(data);
+          throw new Error('COULD NOT FIND THE URL');
+          
+        } 
+        else {
+          const data = response.json();
+          setSavedPath(data);
+          console.warn('TESTING: structure of data loaded', data);
+        };
+        
       } catch (error) {
         // Handle errors
         console.error('There was a problem with the fetch operation:', error);
@@ -132,6 +108,7 @@ export default function App() {
     handleLoadingPaths();
     
   }, [closePopUp]);
+
 
 
   async function requestPermission() {
@@ -172,7 +149,7 @@ export default function App() {
 
           {/* layout for a path */}
 
-          <ScrollView>
+          {/*<ScrollView>
 
             {savedPath && savedPath.map((item, index) => (
 
@@ -188,7 +165,7 @@ export default function App() {
               
             ))}
 
-          </ScrollView>
+          </ScrollView>*/}
         </View>
       </Modal>
 
@@ -210,8 +187,6 @@ export default function App() {
 
       <View style={styles.mapBox}>
         <GoogleMap
-          searchLocation={searchLocation}
-          setSearchLocation={setSearchLocation}
           userLocation={userLocation}
           marker={marker}
           setMarker={setMarker}

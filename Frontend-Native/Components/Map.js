@@ -28,7 +28,7 @@ const router = '../assets/router.png'; // 64px
 const cancel = '../assets/cancel.png';
 const checkmark = '../assets/destinations.png';
 
-export default function GoogleMap({ searchLocation, setSearchLocation, userLocation,
+export default function GoogleMap({ userLocation,
     marker, setMarker,
     addPin, 
     removePin, setRemovePin, 
@@ -47,48 +47,23 @@ export default function GoogleMap({ searchLocation, setSearchLocation, userLocat
 
     const mapRef = useRef(null);
 
+    // center of the map
     const [center, setCenter] = useState(initialRegion);
     
+    // array to store coordinates of drawn path
     const [polylinePath, setPolylinePath] = useState([]);
 
+    // boolean to set style of map
     const [mapType, setMapType] = useState('standard');
 
+    // start location marker coordinate
     const [startLocation, setStartLocation] = useState(null);
 
+    // array of stops coordinates
     const [ destinations, setDestinations] = useState([]);
 
+    // to save text input when saving user path name
     const [inputValue, setInputValue] = useState('');
-
-  
-
-
-
-    // ? when user searches a place
-    const handleSearchLocation = () => {
-        
-        if (searchLocation) {
-            console.log('inside chanign map');
-
-            mapRef.current.animateToRegion({
-                ...center,
-                ...searchLocation,
-            });
-
-            setCenter({
-                latitude: searchLocation.lat,
-                longitude: searchLocation.lng,
-                latitudeDelta:  0.01,
-                longitudeDelta: 0.01
-            }); 
-            
-
-            
-
-            setSearchLocation(null);
-        }
-    }
-
-    useEffect(() => { handleSearchLocation(); }, [searchLocation]);
 
     // TODO focus map to user locaiton
     const focusUser = () => {
@@ -183,16 +158,8 @@ export default function GoogleMap({ searchLocation, setSearchLocation, userLocat
                 setStopsAdded(false);
                 setDeleteTravelSalesman(false);
             
-        };
-            
-            
-           
+        };    
     };
-
-    
-
-   
-
 
 
     // * draws path
@@ -228,14 +195,11 @@ export default function GoogleMap({ searchLocation, setSearchLocation, userLocat
             setMarker(newPath.center);
             setPolylinePath(newPath.route);
             focusMarker();
-            setNewPath(null);
+            setNewPath(null); // retuns to default state - empty
         }
     };
 
     
-
-
-
     // * when submitting file
     // submits either drawn path or travel salesman markers
     const submitPath = () => {
