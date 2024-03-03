@@ -16,9 +16,9 @@ client = MongoClient(uri)
 
 #Redis Data Store Information
 r = redis.Redis(
-    host='redis-10297.c326.us-east-1-3.ec2.cloud.redislabs.com',
-    port=10297,
-    password='BkfdYjsO0yEZcJ6CZqFdavPAk1Xg9Esa')
+    host='redis-18159.c274.us-east-1-3.ec2.cloud.redislabs.com',
+    port=18159,
+    password='JAmKJ1sxcZgGmZmkWg6RnJInQZlwL9Nf')
     
 #Set up Default Home Page
 @app.route("/")
