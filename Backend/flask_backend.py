@@ -2,7 +2,7 @@ from flask import Flask, request
 from flask_cors import CORS
 import json
 import redis
-from pymongo import MongoClient
+from pymongo.mongo_client import MongoClient
 
 #Flask Server Information
 app = Flask(__name__)
