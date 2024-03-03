@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 import json
 import redis
@@ -9,7 +9,7 @@ app = Flask(__name__)
 CORS(app, origin = 'http://localhost:8000', resources={r"/*": {"origins": "*"}})
 
 #MongoDB Information
-uri = "mongodb+srv://raviraghavan:gnGgV5YnXLFrYXJ7@capstone.fj6fsut.mongodb.net/?retryWrites=true&w=majority&appName=Capstone"
+uri = "mongodb+srv://raviraghavan:gnGgV5YnXLFrYXJ7@capstone.fj6fsut.mongodb.net/?retryWrites=true&w=majority"
 
 # Create a new client and connect to the server
 client = MongoClient(uri)
@@ -35,6 +35,30 @@ def traveling_salesman():
         print(type(data))
         
         return "Successfully Submitted"
+
+#Load Paths from MongoDB
+@app.route("/load_paths", methods=['GET'])
+def load_paths():
+    # Send a ping to confirm a successful connection
+    try:
+        client.admin.command('ping')
+        print("Pinged your deployment. You successfully connected to MongoDB!")
+    except Exception as e:
+        print(e)
+
+    #Get MongoDB Collection
+    db = client["Saved_Data"]
+    collection = db["Saved_Paths"]
+
+    # Fetch all documents from the collection
+    documents = collection.find({}, {"_id": 0})
+
+    # Convert the cursor to a list
+    documents_list = list(documents)
+    
+    print(jsonify(documents_list))
+    
+    return jsonify(documents_list)
 
 #Receive Data from Front End
 @app.route("/submit_path", methods=['POST'])

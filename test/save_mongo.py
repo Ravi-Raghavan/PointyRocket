@@ -7,13 +7,13 @@ import redis
 uri = "mongodb+srv://raviraghavan:gnGgV5YnXLFrYXJ7@capstone.fj6fsut.mongodb.net/?retryWrites=true&w=majority"
 
 # Create a new client and connect to the server
-client = MongoClient(uri)
+client = MongoClient(uri, ssl=True)
 
 #Redis Data Store Information
 r = redis.Redis(
-    host='redis-10297.c326.us-east-1-3.ec2.cloud.redislabs.com',
-    port=10297,
-    password='BkfdYjsO0yEZcJ6CZqFdavPAk1Xg9Esa')
+    host='redis-18159.c274.us-east-1-3.ec2.cloud.redislabs.com',
+    port=18159,
+    password='JAmKJ1sxcZgGmZmkWg6RnJInQZlwL9Nf')
 
 # Send a ping to confirm a successful connection
 try:
