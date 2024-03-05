@@ -15,12 +15,14 @@ const initialRegion = {
 const primaryCol = '#ED7D31' //'#FFBB64';
 const secondaryCol = '#4F4A45'//'#2D3250';
 const accent = 'white';
+const subLineCol = 'white'//'#005B41'; // line color when submit clicked
 
 const ipAddressDraw = 'https://factual-moved-snapper.ngrok-free.app/submit_path';
 const ipAddressRoute = 'https://factual-moved-snapper.ngrok-free.app/traveling_salesman';
 const ipAddressSave = 'https://factual-moved-snapper.ngrok-free.app/save_data';
 
 const routerRange = 100 // meters
+
 
 
 const origin = '../assets/start.png';
@@ -64,6 +66,9 @@ export default function GoogleMap({ userLocation,
 
     // to save text input when saving user path name
     const [inputValue, setInputValue] = useState('');
+
+    // line color changes when drawn path is submitted
+    const [defaultLineCol, setdefaultLineCol] = useState(primaryCol);
 
     // TODO focus map to user locaiton
     const focusUser = () => {
@@ -137,6 +142,7 @@ export default function GoogleMap({ userLocation,
             setRemovePin(false);
             setPolylinePath([]);
             setDrawn(false);
+            setdefaultLineCol(primaryCol)
 
             setStartLocation(null);
             setStartLocationBoolean(false);
@@ -219,6 +225,7 @@ export default function GoogleMap({ userLocation,
                 })
 
                 console.assert('Data is sent');
+                setdefaultLineCol(subLineCol);
             }
             catch (error){
                 console.error('An error occurred during drawing submission:', error.message);
@@ -382,7 +389,7 @@ export default function GoogleMap({ userLocation,
                         {polylinePath && (
                             <Polyline
                                 coordinates={polylinePath}
-                                strokeColor={'#ED7D31'}
+                                strokeColor={defaultLineCol}
                                 strokeWidth={1.5}
                                 
                             />

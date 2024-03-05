@@ -21,10 +21,6 @@ const accent = 'white';
 const toggle = '#005B41';
 const alert = '#D2042D';
 
-
-// screen dimensions
-const { width } = Dimensions.get('window');
-
 const ButtonLayout = ({ marker, addPin, setAddPin, setRemovePin, drawPath, setDrawPath, setDeletePath, drawn, isSubmit, isToSave,
     setIsStartLoc, setIsDestination, setRoute, setClosePopUp, startLocationBoolean, stopsAdded, setDeleteTravelSalesman }) =>{
 
@@ -279,9 +275,9 @@ const ButtonLayout = ({ marker, addPin, setAddPin, setRemovePin, drawPath, setDr
 
                 </View>
 
-                <View style={btnStyle.btnFrame} >
+                <View style={[btnStyle.btnFrame, addtoggled || drawtoggled || originToggle || stopToggle ? btnStyle.inactive : null]} >
 
-                    <TouchableOpacity onPress={handleLoad}>
+                    <TouchableOpacity onPress={handleLoad} disabled={addtoggled || drawtoggled || originToggle || stopToggle}>
 
                         <View style={btnStyle.ImageContainer}>
                             <Image

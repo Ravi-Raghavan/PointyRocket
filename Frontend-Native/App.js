@@ -1,10 +1,11 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import GoogleMap from './Components/Map';
 import ButtonLayout from './Components/Buttons';
 import { useEffect, useState } from 'react';
 import * as Location from 'expo-location';
 import Modal from "react-native-modal";
+import { GestureHandlerRootView, PanGestureHandler, State } from 'react-native-gesture-handler';
 
 
 //  colors
@@ -15,9 +16,14 @@ const accent = 'white';
 
 // image locations
 const cancel = './assets/cancel.png';
+const delete_path = './assets/delete_path.png';
 
 // urls to fetch data from backen
 const load_url = 'https://factual-moved-snapper.ngrok-free.app/load_paths';
+
+// pointer location
+let startX;
+
 
 export default function App() {
 
@@ -107,7 +113,6 @@ export default function App() {
   useEffect( () => {
     if(closePopUp) {
       handleLoadingPaths();
-      console.log(savedPath[0].name);
     };
   }, [closePopUp]);
 
@@ -126,94 +131,168 @@ export default function App() {
   
   requestPermission()
 
+  //* handles delete path when clicked
+  // delete saved path
+  const handleDelSavePath = (path) => {
 
+    // saved path should exsists
+    if(savedPath) {
+
+      // index of the path
+      const index = savedPath.indexOf(path);
+
+      savedPath.splice(index, 1);
+      setSavedPath(savedPath);
+
+      // send updated array to backend
+    };
+  };
+
+
+  // shows alert to confirm users choice to delete path
+  const showAlert = (path) => {
+    Alert.alert(
+      `Delete ${path.name}`,
+      'Are you certain you wish to delete this saved path?',
+      [
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel'
+        },
+        { text: 'OK', onPress: () => handleDelSavePath(path) }
+      ],
+      { cancelable: false }
+    );
+  };
 
   
-  return (   
-    <View style={styles.container}>
+  // * detects swipe to the left or right
+  const onHandlerStateChange = event => {
+    if (event.nativeEvent.state === State.ACTIVE) {
+      startX = event.nativeEvent.translationX;
+    } else if (event.nativeEvent.state === State.END) {
+      const endX = event.nativeEvent.translationX;
 
-      <Modal isVisible={closePopUp} style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <View style={{ backgroundColor: secondaryCol, width:'90%', height: '70%', padding:16, borderRadius: '20%' }}>
+      // right swip
+      if (endX - startX < -100) {
+        console.log('Swipe to the right detected!');
+        
+      }
 
+      // left swip
+      else if (endX - startX > 100 ) {
+        console.log('Swipe to the left detected!');
+      };
+    }
+  };
 
-          {/* title and cross button */}
-          <View style={{flexDirection: 'row', alignItems:'center', justifyContent: 'space-between', marginBottom: 8}}>
-            <Text style={{ fontSize: 30, color: primaryCol }}>Select Path to Load</Text>
-            <TouchableOpacity onPress={ () => {setClosePopUp(false)}}>
-              <Image
-                source={require(cancel)}
-                style={{ height: 30, width: 30 }}
-              ></Image>
-            </TouchableOpacity>
-          </View>
-
-          {/* layout for a path */}
-
-          <ScrollView>
-
-            {savedPath && savedPath.map((item, index) => (
-
-              <TouchableOpacity onPress={ () => newPathObject(item)}>
-                <View key={item.name} style={{ backgroundColor: primaryCol, padding: 8, borderRadius: 10, marginBottom: 8 }} >
-                  <Text style={{ fontSize: 24, color: accent }}>{item.name} </Text>
-
-                  <Text style={{ fontSize: 14, color: accent }}>Center Coordinate: ({item.center.latitude}, {item.center.longitude})</Text>
-                  <Text style={{ fontSize: 14, color: accent }}>Start Coordinate: ({item.route[0].latitude}, {item.route[0].longitude})</Text>
-                  <Text style={{ fontSize: 14, color: accent }}>End Coordinate: ({item.route[item.route.length - 1].latitude}, {item.route[item.route.length - 1].longitude})</Text>
-                </View>
-              </TouchableOpacity>
-              
-            ))}
-
-          </ScrollView>
-        </View>
-      </Modal>
-
-
-      <StatusBar style="light" translucent={true} />
+  
+  return ( 
+    <GestureHandlerRootView style={{ flex: 1}}> 
+      
+      <View style={styles.container}>
 
       
+        <Modal isVisible={closePopUp} style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <PanGestureHandler
+            onHandlerStateChange={onHandlerStateChange}
+          >
+            <View style={{ backgroundColor: secondaryCol, width: '90%', height: '70%', padding: 16, borderRadius: '20%' }}>
 
-      <View style={styles.searchBox}>
 
-       
+              {/* title and cross button */}
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                <Text style={{ fontSize: 30, color: primaryCol }}>Select Path to Load</Text>
+                <TouchableOpacity onPress={() => { setClosePopUp(false) }}>
+                  <Image
+                    source={require(cancel)}
+                    style={{ height: 30, width: 30 }}
+                  ></Image>
+                </TouchableOpacity>
+              </View>
+
+              {/* layout for a path */}
+
+              <ScrollView>
+
+                {savedPath && savedPath.map((item, index) => (
+
+                  <TouchableOpacity onPress={() => newPathObject(item)} key={item.name} onLongPress={() => { showAlert(item) }}>
+                    <View style={{ backgroundColor: primaryCol, padding: 8, borderRadius: 10, marginBottom: 8 }} >
+
+                      <View style={{ justifyContent: 'space-between', flexDirection: 'row', alignItems: 'center' }}>
+                        <Text style={{ fontSize: 24, color: accent }}>{item.name} </Text>
+
+
+                        <View style={{ height: '100%', width: 20 }}>
+                          <Image
+                            source={require(delete_path)}
+                            style={{ height: 16, width: 16, marginRight: 2 }}
+                          ></Image>
+                        </View>
+                      </View>
+
+                      <Text style={{ fontSize: 14, color: accent }}>Center Coordinate: ({item.center.latitude}, {item.center.longitude})</Text>
+                      <Text style={{ fontSize: 14, color: accent }}>Start Coordinate: ({item.route[0].latitude}, {item.route[0].longitude})</Text>
+                      <Text style={{ fontSize: 14, color: accent }}>End Coordinate: ({item.route[item.route.length - 1].latitude}, {item.route[item.route.length - 1].longitude})</Text>
+                    </View>
+                  </TouchableOpacity>
+
+                ))}
+
+
+
+              </ScrollView>
+            </View>
+          </PanGestureHandler>
+        </Modal>
+
+
+        <StatusBar style="light" translucent={true} />
+
+
+
+        <View style={styles.searchBox}>
+
+
           <Text style={styles.logo_text}>Drone Path Pro</Text>
           <Image
             source={require('./assets/logo.png')} // Replace with the actual path to your image
             style={styles.logo_img}
           />
-        
-      </View>
 
-      <View style={styles.mapBox}>
-        <GoogleMap
-          userLocation={userLocation}
-          marker={marker}
-          setMarker={setMarker}
-          addPin={addPin}
-          removePin={removePin}
-          setRemovePin={setRemovePin}
-          drawPath={drawPath}
-          deletePath={deletePath}
-          setDeletePath={setDeletePath}
-          setDrawn={setDrawn}
-          submit={submit}
-          isSubmit={isSubmit}
-          toSave={toSave}
-          isToSave={isToSave}
-          isStartLoc={isStartLoc}
-          isDestination={isDestination}
-          isRoute={isRoute}
-          setRoute={setRoute}
-          newPath={newPath}
-          setNewPath={setNewPath}
-          setStartLocationBoolean={setStartLocationBoolean}
-          setStopsAdded={setStopsAdded}
-          deleteTravelSalesman={deleteTravelSalesman}
-          setDeleteTravelSalesman={setDeleteTravelSalesman}
-          
-        />
-      </View>
+        </View>
+
+        <View style={styles.mapBox}>
+          <GoogleMap
+            userLocation={userLocation}
+            marker={marker}
+            setMarker={setMarker}
+            addPin={addPin}
+            removePin={removePin}
+            setRemovePin={setRemovePin}
+            drawPath={drawPath}
+            deletePath={deletePath}
+            setDeletePath={setDeletePath}
+            setDrawn={setDrawn}
+            submit={submit}
+            isSubmit={isSubmit}
+            toSave={toSave}
+            isToSave={isToSave}
+            isStartLoc={isStartLoc}
+            isDestination={isDestination}
+            isRoute={isRoute}
+            setRoute={setRoute}
+            newPath={newPath}
+            setNewPath={setNewPath}
+            setStartLocationBoolean={setStartLocationBoolean}
+            setStopsAdded={setStopsAdded}
+            deleteTravelSalesman={deleteTravelSalesman}
+            setDeleteTravelSalesman={setDeleteTravelSalesman}
+
+          />
+        </View>
 
 
         <View style={styles.btnBox}>
@@ -226,22 +305,23 @@ export default function App() {
             setDrawPath={setDrawPath}
             setDeletePath={setDeletePath}
             drawn={drawn}
-          isSubmit={isSubmit}
-          isToSave={isToSave}
-          setIsStartLoc={setIsStartLoc}
-          setIsDestination={setIsDestination}
-          setRoute={setRoute}
-          setClosePopUp={setClosePopUp}
-          startLocationBoolean={startLocationBoolean}
-          stopsAdded={stopsAdded}
-          setDeleteTravelSalesman={setDeleteTravelSalesman}
+            isSubmit={isSubmit}
+            isToSave={isToSave}
+            setIsStartLoc={setIsStartLoc}
+            setIsDestination={setIsDestination}
+            setRoute={setRoute}
+            setClosePopUp={setClosePopUp}
+            startLocationBoolean={startLocationBoolean}
+            stopsAdded={stopsAdded}
+            setDeleteTravelSalesman={setDeleteTravelSalesman}
           />
-        </View> 
-  
-      
-      
+        </View>
+
         
-    </View>
+      </View>
+    </GestureHandlerRootView>
+    
+    
   );
 }
 
