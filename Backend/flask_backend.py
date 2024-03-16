@@ -102,6 +102,7 @@ def load_paths():
     # Convert the cursor to a list
     documents_list = list(documents)
     
+    print("Documents List: ", documents_list)
     print(jsonify(documents_list))
     
     return jsonify(documents_list)
