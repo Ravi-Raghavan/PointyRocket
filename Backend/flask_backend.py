@@ -35,6 +35,52 @@ def traveling_salesman():
         print(type(data))
         
         return "Successfully Submitted"
+    
+#Delete Path from MongoDB
+@app.route("/delete_path", methods=['POST'])
+def delete_path():
+    if request.method == 'POST':
+        data = request.get_json()
+        print("Data Received: ", data)
+        
+        path_name = data['name']
+        
+        ### REMOVE DATA FROM REDIS
+        all_keys = r.keys('path:*')
+
+        # Define the name you're searching for
+        name_to_search = path_name
+
+        # Iterate through keys and check if their corresponding values contain the desired name
+        keys_with_desired_name = []
+        for key in all_keys:
+            value = r.get(key)            
+            if value:
+                # Assuming the stored value is JSON
+                try:
+                    value_dict = json.loads(value)
+                    if 'name' in value_dict and value_dict['name'] == name_to_search:
+                        keys_with_desired_name.append(key)
+                except:
+                    continue
+
+        #Remove Keys, decrement path counter
+        for key in keys_with_desired_name:
+            idx = int(key[5:])
+            r.decr("path_counter")
+            r.delete(key)
+            r.lrem('path_list', 0, idx)
+        
+        ### REMOVE DATA FROM MONGODB
+        # Define the filter
+        db = client["Saved_Data"]
+        collection = db["Saved_Paths"]
+        filter = {'name': name_to_search}
+        result = collection.delete_many(filter)
+        print(f"Deleted {result.deleted_count} documents.")
+
+
+        return 'Successfully Submitted'
 
 #Load Paths from MongoDB
 @app.route("/load_paths", methods=['GET'])
