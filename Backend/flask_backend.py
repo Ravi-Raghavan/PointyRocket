@@ -181,7 +181,16 @@ def save_data():
         print(f"Inserted Recent Path with ID: {result.inserted_id}")
         
         return 'Data Saved to MongoDB'
-        
+
+#Send GPS Data to Backend
+@app.route("/send_gps_data", methods = ["POST"])
+def send_gps_data():
+    if request.method == 'POST':
+        print("Post Request Received")
+        print("Request: ", request.get_data())
+        data = request.get_json()
+        print("Data Received: ", data)
+        return 'Successful'
 
 #Run Flask Application
 if __name__ == "__main__":
