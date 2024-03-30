@@ -3,6 +3,10 @@ from flask_cors import CORS
 import json
 import redis
 from pymongo import MongoClient
+from geopy.distance import great_circle
+from itertools import permutations
+import networkx as nx
+import ast
 
 #Flask Server Information
 app = Flask(__name__)
@@ -25,15 +29,75 @@ r = redis.Redis(
 def hello_world():
     return "<p>Backend Flask Server</p>"
 
+#Store traveling salesman path in Redis
+def store_traveling_salesman_path(path):
+    queue_name = 'traveling_salesman_queue'
+    path = json.dumps(path)
+    
+    # Check if the queue exists
+    if not r.exists(queue_name):
+        # Create the queue
+        r.rpush(queue_name, path)
+        print(f"Queue '{queue_name}' created and items pushed: {path}")
+    else:
+        # Push items to the existing queue
+        r.rpush(queue_name, path)
+        print(f"Items pushed to queue '{queue_name}': {path}")
+
+#Load traveling salesman path from Redis
+def load_traveling_salesman_path():
+    queue_name = 'traveling_salesman_queue'
+    front_item = r.lindex(queue_name, 0).decode('utf-8')
+    front_item = ast.literal_eval(front_item)
+    front_item = json.loads(front_item)
+    return front_item
+
+#Get Traveling Salesman Path
+@app.route("/get_traveling_salesman_path", methods = ["GET"])
+def get_traveling_salesman_path():
+    if request.method == "GET":
+        traveling_salesman_path = load_traveling_salesman_path()
+        return traveling_salesman_path
+
 #Solve Traveling Salesman Problem 
 @app.route("/traveling_salesman", methods = ["POST"])
 def traveling_salesman():
     if request.method == "POST":
         data = request.get_json()
-        print("Data Received: ", data)
         
-        print(type(data))
+        #Initialize dictionary with Starting Point
+        nodes = {}
+        nodes['startPoint'] = (data['startPoint']['latitude'], data['startPoint']['longitude'])    
         
+        #Add destination points to graph
+        for index, destination in enumerate(data['destinations']):
+            nodes[f'destination_{index}'] = (destination['latitude'], destination['longitude'])   
+            
+        # Specify the starting point
+        starting_node = 'startPoint'
+        
+        # Create a complete graph where each node is connected to every other node
+        G = nx.Graph()
+        for point in nodes:
+            G.add_node(point, pos = nodes[point])
+
+        # Connect nodes based on great circle distance
+        for node1, node2 in permutations(G.nodes(), 2):
+            pos1 = G.nodes[node1]['pos']
+            pos2 = G.nodes[node2]['pos']
+            distance = great_circle(pos1, pos2).kilometers
+            G.add_edge(node1, node2, weight = distance)
+
+        # Find the shortest path starting from the specified starting point
+        shortest_path = list(nx.approximation.traveling_salesman_problem(G, cycle=True))
+        
+        # Reorder the path to start from the specified starting point and get the corresponding longitude/latitude coordinates
+        index = shortest_path.index(starting_node)
+        shortest_path = shortest_path[index:] + shortest_path[:index]
+        coordinates =  [nodes[point] for point in shortest_path]
+        
+        #Store Traveling Salesman Path in Redis
+        store_traveling_salesman_path(coordinates)
         return "Successfully Submitted"
     
 #Delete Path from MongoDB
