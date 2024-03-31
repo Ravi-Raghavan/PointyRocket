@@ -7,6 +7,7 @@ from geopy.distance import great_circle
 from itertools import permutations
 import networkx as nx
 import ast
+import numpy as np
 
 #Flask Server Information
 app = Flask(__name__)
@@ -23,6 +24,10 @@ r = redis.Redis(
     host='redis-18159.c274.us-east-1-3.ec2.cloud.redislabs.com',
     port=18159,
     password='JAmKJ1sxcZgGmZmkWg6RnJInQZlwL9Nf')
+
+#Given an angle in radians, make sure it is from -pi to pi
+def scale_angle(theta):
+    return theta - (2 * np.pi * (np.floor((theta + np.pi) / (2 * np.pi))))
     
 #Set up Default Home Page
 @app.route("/")
@@ -47,16 +52,69 @@ def store_traveling_salesman_path(path):
 #Load traveling salesman path from Redis
 def load_traveling_salesman_path():
     queue_name = 'traveling_salesman_queue'
-    front_item = r.lindex(queue_name, 0).decode('utf-8')
-    front_item = ast.literal_eval(front_item)
+    front_item = r.lindex(queue_name, 0)
     front_item = json.loads(front_item)
     return front_item
+
+#Send Drone Orientation to Backend
+@app.route("/set_drone_orientation", methods = ["POST"])
+def set_drone_orientation():
+    if request.method == "POST":
+        drone_orientation_data = request.get_json()
+        r.hset('drone_orientation', 'longitude', drone_orientation_data['longitude'])
+        r.hset('drone_orientation', 'latitude', drone_orientation_data['latitude'])
+        r.hset('drone_orientation', 'orientation_angle', drone_orientation_data['orientation_angle'])
+        return "SUCCESSFULLY UPDATED DRONE ORIENTATION"
+
+#Get Drone Orientation From Backend
+@app.route("/get_drone_orientation", methods = ["GET"])
+def get_drone_orientation():
+    if request.method == "GET":
+        longitude = float(r.hget('drone_orientation', 'longitude').decode('utf-8'))
+        latitude = float(r.hget('drone_orientation', 'latitude').decode('utf-8'))
+        orientation_angle = float(r.hget('drone_orientation', 'orientation_angle').decode('utf-8'))
+        
+        drone_orientation = {
+            "longitude": longitude,
+            "latitude": latitude,
+            "orientation_angle": orientation_angle
+        }
+        
+        return json.dumps(drone_orientation)
 
 #Get Traveling Salesman Path
 @app.route("/get_traveling_salesman_path", methods = ["GET"])
 def get_traveling_salesman_path():
     if request.method == "GET":
         traveling_salesman_path = load_traveling_salesman_path()
+        
+        if (len(traveling_salesman_path) < 2):
+            r.lpop('traveling_salesman_queue')
+            return "YOU HAVE ALREADY FINSHED YOUR PATH"
+                        
+        #Current Drone Orientation
+        longitude = float(r.hget('drone_orientation', 'longitude').decode('utf-8'))
+        latitude = float(r.hget('drone_orientation', 'latitude').decode('utf-8'))
+        orientation_angle = float(r.hget('drone_orientation', 'orientation_angle').decode('utf-8'))
+        
+        #Next Drone Orientation
+        next_point = traveling_salesman_path[1]
+        
+        dx = next_point[0] - longitude
+        dy = next_point[1] - latitude
+        angle_rad = np.arctan2(dy, dx)
+        dTheta = scale_angle(orientation_angle - angle_rad)
+        
+        print(f"dx: {dx}, dy: {dy}, dz: {dTheta}")
+        
+        #Remove the "current point" from traveling salesman path
+        traveling_salesman_path = traveling_salesman_path[1: ]
+                
+        #Update Traveling Salesman Queue
+        queue_name = 'traveling_salesman_queue'
+        r.lset(queue_name, 0, json.dumps(traveling_salesman_path))
+        
+        #Return Updated Traveling Salesman Path
         return traveling_salesman_path
 
 #Solve Traveling Salesman Problem 

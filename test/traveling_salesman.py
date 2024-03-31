@@ -77,7 +77,8 @@ print("Shortest path starting from", starting_node + ":", shortest_path)
 print("Shortest Path starting from", str(coordinates[0]) + ":", coordinates)
 
 store_traveling_salesman_path(json.dumps(coordinates))
-loaded_path = load_traveling_salesman_path()
+# loaded_path = load_traveling_salesman_path()
 
-for coord in loaded_path:
-    print("Longitude: ", coord[0], " Latitude: ", coord[1])
+# print(type(loaded_path))
+# for coord in loaded_path:
+#     print("Longitude: ", coord[0], " Latitude: ", coord[1])
