@@ -88,7 +88,7 @@ def get_traveling_salesman_path():
     if request.method == "GET":
         traveling_salesman_path = load_traveling_salesman_path()
         
-        if (len(traveling_salesman_path) < 2):
+        if (len(traveling_salesman_path) < 1):
             r.lpop('traveling_salesman_queue')
             return "YOU HAVE ALREADY FINSHED YOUR PATH"
                         
@@ -98,7 +98,7 @@ def get_traveling_salesman_path():
         orientation_angle = float(r.hget('drone_orientation', 'orientation_angle').decode('utf-8'))
         
         #Next Drone Orientation
-        next_point = traveling_salesman_path[1]
+        next_point = traveling_salesman_path[0]
         
         dx = next_point[0] - longitude
         dy = next_point[1] - latitude
@@ -107,7 +107,7 @@ def get_traveling_salesman_path():
         
         print(f"dx: {dx}, dy: {dy}, dz: {dTheta}")
         
-        #Remove the "current point" from traveling salesman path
+        #Remove the "next point" from traveling salesman path
         traveling_salesman_path = traveling_salesman_path[1: ]
                 
         #Update Traveling Salesman Queue
