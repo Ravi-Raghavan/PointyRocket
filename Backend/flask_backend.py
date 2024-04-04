@@ -56,6 +56,32 @@ def load_traveling_salesman_path():
     front_item = json.loads(front_item)
     return front_item
 
+#Store magnetometer data
+@app.route("/store_magnetometer_data", methods = ["POST"])
+def store_magnetometer_data():
+    if request.method == 'POST':
+        magnetometer_data = request.get_json()
+        r.hset('drone_orientation', 'field_strength_x', magnetometer_data['field_strength_x'])
+        r.hset('drone_orientation', 'field_strength_y', magnetometer_data['field_strength_y'])
+        r.hset('drone_orientation', 'field_strength_z', magnetometer_data['field_strength_z'])
+        return "SUCCESSFULLY UPDATED DRONE DATA"
+    
+#Load magnetometer data
+@app.route("/load_magnetometer_data", methods = ["GET"])
+def load_magnetometer_data():
+    if request.method == 'GET':
+        field_strength_x = float(r.hget('drone_orientation', 'field_strength_x').decode('utf-8'))
+        field_strength_y = float(r.hget('drone_orientation', 'field_strength_y').decode('utf-8'))
+        field_strength_z = float(r.hget('drone_orientation', 'field_strength_z').decode('utf-8'))
+        
+        drone_orientation = {
+            "field_strength_x": field_strength_x,
+            "field_strength_y": field_strength_y,
+            "field_strength_z": field_strength_z
+        }
+        
+        return json.dumps(drone_orientation)
+
 #Send Drone Orientation to Backend
 @app.route("/set_drone_orientation", methods = ["POST"])
 def set_drone_orientation():
