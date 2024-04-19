@@ -118,21 +118,9 @@ def get_traveling_salesman_path():
             r.lpop('traveling_salesman_queue')
             return "YOU HAVE ALREADY FINSHED YOUR PATH"
                         
-        #Current Drone Orientation
-        longitude = float(r.hget('drone_orientation', 'longitude').decode('utf-8'))
-        latitude = float(r.hget('drone_orientation', 'latitude').decode('utf-8'))
-        orientation_angle = float(r.hget('drone_orientation', 'orientation_angle').decode('utf-8'))
-        
         #Next Drone Orientation
         next_point = traveling_salesman_path[0]
-        
-        dx = next_point[0] - longitude
-        dy = next_point[1] - latitude
-        angle_rad = np.arctan2(dy, dx)
-        dTheta = scale_angle(orientation_angle - angle_rad)
-        
-        print(f"dx: {dx}, dy: {dy}, dz: {dTheta}")
-        
+                
         #Remove the "next point" from traveling salesman path
         traveling_salesman_path = traveling_salesman_path[1: ]
                 
@@ -140,8 +128,8 @@ def get_traveling_salesman_path():
         queue_name = 'traveling_salesman_queue'
         r.lset(queue_name, 0, json.dumps(traveling_salesman_path))
         
-        #Return Updated Traveling Salesman Path
-        return traveling_salesman_path
+        #Return GPS Coordinate of Next Point on Path
+        return {'longitude': next_point[0], 'latitude': next_point[1]}
 
 #Solve Traveling Salesman Problem 
 @app.route("/traveling_salesman", methods = ["POST"])
