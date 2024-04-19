@@ -159,13 +159,11 @@ def get_drone_orientation():
 ################################# 
 
 ##### INDIVIDUAL PATH DATA #######
-#Delete Path from MongoDB
+#Given a path name, delete it from Redis and MongoDB
 @app.route("/delete_path", methods=['POST'])
 def delete_path():
     if request.method == 'POST':
-        data = request.get_json()
-        print("Data Received: ", data)
-        
+        data = request.get_json()        
         path_name = data['name']
         
         ### REMOVE DATA FROM REDIS
@@ -179,7 +177,6 @@ def delete_path():
         for key in all_keys:
             value = r.get(key)            
             if value:
-                # Assuming the stored value is JSON
                 try:
                     value_dict = json.loads(value)
                     if 'name' in value_dict and value_dict['name'] == name_to_search:
@@ -189,10 +186,7 @@ def delete_path():
 
         #Remove Keys, decrement path counter
         for key in keys_with_desired_name:
-            idx = int(key[5:])
-            r.decr("path_counter")
             r.delete(key)
-            r.lrem('path_list', 0, idx)
         
         ### REMOVE DATA FROM MONGODB
         # Define the filter
@@ -201,8 +195,6 @@ def delete_path():
         filter = {'name': name_to_search}
         result = collection.delete_many(filter)
         print(f"Deleted {result.deleted_count} documents.")
-
-
         return 'Successfully Submitted'
 
 #Load Paths from MongoDB
@@ -224,10 +216,8 @@ def load_paths():
 
     # Convert the cursor to a list
     documents_list = list(documents)
-    
-    print("Documents List: ", documents_list)
-    print(jsonify(documents_list))
-    
+        
+    #Return JSON version of documents list
     return jsonify(documents_list)
 
 #Receive Data from Front End
@@ -235,21 +225,12 @@ def load_paths():
 def submit_path():
     if request.method == 'POST':
         data = request.get_json()
-        print("Data Received: ", data) 
-        
-        # Get the current length of the list containing documents
-        most_recent_path = r.get("path_counter")
-        if most_recent_path is not None:
-            most_recent_path = int(most_recent_path)
-        else:
-            r.set("path_counter", "0")
-            most_recent_path = 0
+        path_name = data['name']
         
         # Store Data in Redis
-        key = r.incr("path_counter")
+        key = path_name
         path_data = json.dumps(data)
         r.set(f"path:{key}", path_data)
-        r.rpush("path_list", key)
         
         return 'Data Successfully Submitted'
 
@@ -265,36 +246,13 @@ def save_data():
             print(e)
         
         data = request.get_json()
-        print("Data Received: ", data) 
+        path_name = data['name']
     
-        # Get the current length of the list containing documents
-        most_recent_path = r.get("path_counter")
-        if most_recent_path is not None:
-            most_recent_path = int(most_recent_path)
-        else:
-            r.set("path_counter", 0)
-            most_recent_path = 0
-        
         # Store Data in Redis
-        key = r.incr("path_counter")
+        key = path_name
         path_data = json.dumps(data)
         r.set(f"path:{key}", path_data)
-        r.rpush("path_list", key)
         
-         # Get the current length of the list containing documents
-        most_recent_path = r.get("path_counter")
-        if most_recent_path is not None:
-            most_recent_path = int(most_recent_path)
-        else:
-            r.set("path_counter", 0)
-            most_recent_path = 0
-
-        print("Most Recent Path Index:", most_recent_path)
-
-        #Fetch Path Data of Most Recent Path
-        path_data = r.get(f"path:{most_recent_path}")
-        path_data = json.loads(path_data)
-
         #Get MongoDB Collection
         db = client["Saved_Data"]
         collection = db["Saved_Paths"]
