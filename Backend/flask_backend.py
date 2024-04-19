@@ -1,13 +1,13 @@
+#Import Necessary Libraries
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import json
-import redis
-from pymongo import MongoClient
 from geopy.distance import great_circle
 from itertools import permutations
+import json
 import networkx as nx
-import ast
 import numpy as np
+from pymongo import MongoClient
+import redis
 
 #Flask Server Information
 app = Flask(__name__)
@@ -25,29 +25,53 @@ r = redis.Redis(
     port=18159,
     password='JAmKJ1sxcZgGmZmkWg6RnJInQZlwL9Nf')
 
-#Given an angle in radians, make sure it is from -pi to pi
-def scale_angle(theta):
-    return theta - (2 * np.pi * (np.floor((theta + np.pi) / (2 * np.pi))))
-    
-#Set up Default Home Page
-@app.route("/")
-def hello_world():
-    return "<p>Backend Flask Server</p>"
-
-#Store traveling salesman path in Redis
+#### Traveling Salesman Code ####
+#Helper Function to Store Traveling Salesman Path in Redis
 def store_traveling_salesman_path(path):
     queue_name = 'traveling_salesman_queue'
     path = json.dumps(path)
-    
-    # Check if the queue exists
-    if not r.exists(queue_name):
-        # Create the queue
-        r.rpush(queue_name, path)
-        print(f"Queue '{queue_name}' created and items pushed: {path}")
-    else:
-        # Push items to the existing queue
-        r.rpush(queue_name, path)
-        print(f"Items pushed to queue '{queue_name}': {path}")
+    r.rpush(queue_name, path)
+
+#Solve Traveling Salesman Problem and Store Path in Redis
+@app.route("/traveling_salesman", methods = ["POST"])
+def traveling_salesman():
+    if request.method == "POST":
+        data = request.get_json()
+        
+        #Initialize dictionary with Starting Point
+        nodes = {}
+        nodes['startPoint'] = (data['startPoint']['latitude'], data['startPoint']['longitude'])    
+        
+        #Add destination points to graph
+        for index, destination in enumerate(data['destinations']):
+            nodes[f'destination_{index}'] = (destination['latitude'], destination['longitude'])   
+            
+        # Specify the starting point
+        starting_node = 'startPoint'
+        
+        # Create a complete graph where each node is connected to every other node
+        G = nx.Graph()
+        for point in nodes:
+            G.add_node(point, pos = nodes[point])
+
+        # Connect nodes based on great circle distance
+        for node1, node2 in permutations(G.nodes(), 2):
+            pos1 = G.nodes[node1]['pos']
+            pos2 = G.nodes[node2]['pos']
+            distance = great_circle(pos1, pos2).kilometers
+            G.add_edge(node1, node2, weight = distance)
+
+        # Find the shortest path starting from the specified starting point
+        shortest_path = list(nx.approximation.traveling_salesman_problem(G, cycle=True))
+        
+        # Reorder the path to start from the specified starting point and get the corresponding longitude/latitude coordinates
+        index = shortest_path.index(starting_node)
+        shortest_path = shortest_path[index:] + shortest_path[:index]
+        coordinates =  [nodes[point] for point in shortest_path]
+        
+        #Store Traveling Salesman Path in Redis
+        store_traveling_salesman_path(coordinates)
+        return "Successfully Submitted"
 
 #Load traveling salesman path from Redis
 def load_traveling_salesman_path():
@@ -56,7 +80,32 @@ def load_traveling_salesman_path():
     front_item = json.loads(front_item)
     return front_item
 
-#Store magnetometer data
+#Get Traveling Salesman Path
+@app.route("/get_traveling_salesman_path", methods = ["GET"])
+def get_traveling_salesman_path():
+    if request.method == "GET":
+        traveling_salesman_path = load_traveling_salesman_path()
+        
+        if (len(traveling_salesman_path) < 1):
+            r.lpop('traveling_salesman_queue')
+            return "YOU HAVE ALREADY FINSHED YOUR PATH"
+                        
+        #Next Drone Orientation
+        next_point = traveling_salesman_path[0]
+                
+        #Remove the "next point" from traveling salesman path
+        traveling_salesman_path = traveling_salesman_path[1: ]
+                
+        #Update Traveling Salesman Queue
+        queue_name = 'traveling_salesman_queue'
+        r.lset(queue_name, 0, json.dumps(traveling_salesman_path))
+        
+        #Return GPS Coordinate of Next Point on Path
+        return json.dumps({'longitude': next_point[0], 'latitude': next_point[1]})
+#################################
+
+#### Drone Orientation Data ####
+#Store Magnetometer Data in Redis
 @app.route("/store_magnetometer_data", methods = ["POST"])
 def store_magnetometer_data():
     if request.method == 'POST':
@@ -66,7 +115,7 @@ def store_magnetometer_data():
         r.hset('drone_orientation', 'field_strength_z', magnetometer_data['field_strength_z'])
         return "SUCCESSFULLY UPDATED DRONE DATA"
     
-#Load magnetometer data
+#Load Magnetometer Data in Redis
 @app.route("/load_magnetometer_data", methods = ["GET"])
 def load_magnetometer_data():
     if request.method == 'GET':
@@ -107,71 +156,9 @@ def get_drone_orientation():
         }
         
         return json.dumps(drone_orientation)
+################################# 
 
-#Get Traveling Salesman Path
-@app.route("/get_traveling_salesman_path", methods = ["GET"])
-def get_traveling_salesman_path():
-    if request.method == "GET":
-        traveling_salesman_path = load_traveling_salesman_path()
-        
-        if (len(traveling_salesman_path) < 1):
-            r.lpop('traveling_salesman_queue')
-            return "YOU HAVE ALREADY FINSHED YOUR PATH"
-                        
-        #Next Drone Orientation
-        next_point = traveling_salesman_path[0]
-                
-        #Remove the "next point" from traveling salesman path
-        traveling_salesman_path = traveling_salesman_path[1: ]
-                
-        #Update Traveling Salesman Queue
-        queue_name = 'traveling_salesman_queue'
-        r.lset(queue_name, 0, json.dumps(traveling_salesman_path))
-        
-        #Return GPS Coordinate of Next Point on Path
-        return {'longitude': next_point[0], 'latitude': next_point[1]}
-
-#Solve Traveling Salesman Problem 
-@app.route("/traveling_salesman", methods = ["POST"])
-def traveling_salesman():
-    if request.method == "POST":
-        data = request.get_json()
-        
-        #Initialize dictionary with Starting Point
-        nodes = {}
-        nodes['startPoint'] = (data['startPoint']['latitude'], data['startPoint']['longitude'])    
-        
-        #Add destination points to graph
-        for index, destination in enumerate(data['destinations']):
-            nodes[f'destination_{index}'] = (destination['latitude'], destination['longitude'])   
-            
-        # Specify the starting point
-        starting_node = 'startPoint'
-        
-        # Create a complete graph where each node is connected to every other node
-        G = nx.Graph()
-        for point in nodes:
-            G.add_node(point, pos = nodes[point])
-
-        # Connect nodes based on great circle distance
-        for node1, node2 in permutations(G.nodes(), 2):
-            pos1 = G.nodes[node1]['pos']
-            pos2 = G.nodes[node2]['pos']
-            distance = great_circle(pos1, pos2).kilometers
-            G.add_edge(node1, node2, weight = distance)
-
-        # Find the shortest path starting from the specified starting point
-        shortest_path = list(nx.approximation.traveling_salesman_problem(G, cycle=True))
-        
-        # Reorder the path to start from the specified starting point and get the corresponding longitude/latitude coordinates
-        index = shortest_path.index(starting_node)
-        shortest_path = shortest_path[index:] + shortest_path[:index]
-        coordinates =  [nodes[point] for point in shortest_path]
-        
-        #Store Traveling Salesman Path in Redis
-        store_traveling_salesman_path(coordinates)
-        return "Successfully Submitted"
-    
+##### INDIVIDUAL PATH DATA #######
 #Delete Path from MongoDB
 @app.route("/delete_path", methods=['POST'])
 def delete_path():
@@ -317,16 +304,7 @@ def save_data():
         print(f"Inserted Recent Path with ID: {result.inserted_id}")
         
         return 'Data Saved to MongoDB'
-
-#Send GPS Data to Backend
-@app.route("/send_gps_data", methods = ["POST"])
-def send_gps_data():
-    if request.method == 'POST':
-        print("Post Request Received")
-        print("Request: ", request.get_data())
-        data = request.get_json()
-        print("Data Received: ", data)
-        return 'Successful'
+################################# 
 
 #Run Flask Application
 if __name__ == "__main__":

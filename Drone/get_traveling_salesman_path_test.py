@@ -14,7 +14,12 @@ if response.status_code == 200:
     print("GET request was successful!")
     print("Response:", response.text)
     
-    data = response.json()
+    data = None
+    try:
+        data = response.json()
+    except:
+        pass
+    
     if data != None:
         print("Data: ", data)
         print("Type of Data: ", type(data))
