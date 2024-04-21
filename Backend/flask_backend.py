@@ -186,40 +186,18 @@ def get_drone_orientation():
 ################################# 
 
 ##### INDIVIDUAL PATH DATA #######
-#Given a path name, delete it from Redis and MongoDB
+#Given a path name, delete it from MongoDB
 @app.route("/delete_path", methods=['POST'])
 def delete_path():
     if request.method == 'POST':
         data = request.get_json()        
         path_name = data['name']
         
-        ### REMOVE DATA FROM REDIS
-        all_keys = r.keys('path:*')
-
-        # Define the name you're searching for
-        name_to_search = path_name
-
-        # Iterate through keys and check if their corresponding values contain the desired name
-        keys_with_desired_name = []
-        for key in all_keys:
-            value = r.get(key)            
-            if value:
-                try:
-                    value_dict = json.loads(value)
-                    if 'name' in value_dict and value_dict['name'] == name_to_search:
-                        keys_with_desired_name.append(key)
-                except:
-                    continue
-
-        #Remove Keys, decrement path counter
-        for key in keys_with_desired_name:
-            r.delete(key)
-        
         ### REMOVE DATA FROM MONGODB
         # Define the filter
         db = client["Saved_Data"]
         collection = db["Saved_Paths"]
-        filter = {'name': name_to_search}
+        filter = {'name': path_name}
         result = collection.delete_many(filter)
         print(f"Deleted {result.deleted_count} documents.")
         return 'Successfully Submitted'
@@ -247,22 +225,21 @@ def load_paths():
     #Return JSON version of documents list
     return jsonify(documents_list)
 
-#Receive Data from Front End
+#Receive Data from Front End and Store in REDIS
 @app.route("/submit_path", methods=['POST'])
 def submit_path():
     if request.method == 'POST':
-        data = request.get_json()
-        path_name = data['name']
-        
+        #Get Data
+        data = request.get_json()     
+           
         # Store Data in Redis
-        key = path_name
         path_data = json.dumps(data)
-        r.set(f"path:{key}", path_data)
+        r.set(f"path", path_data)
         
         return 'Data Successfully Submitted'
 
-# Save button to tell application to save Redis Data to MongoDB
-@app.route("/save_data", methods = ["POST"])
+# Save button to tell application to save data to MongoDB
+@app.route("/save_path", methods = ["POST"])
 def save_data():
     if request.method == 'POST':
         # Send a ping to confirm a successful connection
@@ -272,13 +249,9 @@ def save_data():
         except Exception as e:
             print(e)
         
-        data = request.get_json()
-        path_name = data['name']
-    
-        # Store Data in Redis
-        key = path_name
-        path_data = json.dumps(data)
-        r.set(f"path:{key}", path_data)
+        #Get Data
+        data = request.get_json() 
+        path_data = data           
         
         #Get MongoDB Collection
         db = client["Saved_Data"]
@@ -289,6 +262,53 @@ def save_data():
         print(f"Inserted Recent Path with ID: {result.inserted_id}")
         
         return 'Data Saved to MongoDB'
+
+#Load Path Data from Redis
+def load_path():
+    value = r.get('path')
+    return json.loads(value)
+
+#Get Path Data from Drone
+@app.route("/get_path", methods = ["GET"])
+def get_path():
+    if request.method == "GET":
+        path = load_path()['path']
+        
+        #Current Drone Orientation
+        longitude = float(r.hget('drone_orientation', 'longitude').decode('utf-8'))
+        latitude = float(r.hget('drone_orientation', 'latitude').decode('utf-8'))
+        orientation_angle = float(r.hget('drone_orientation', 'orientation_angle').decode('utf-8'))
+                        
+        #Directions
+        directions = []
+        
+        #Go through all coordinates in path and calculate directions
+        current_longitude = longitude
+        current_latitude = latitude
+        current_orientation_angle = orientation_angle
+        for coordinate in path:
+            dx = coordinate['longitude'] - current_longitude
+            dy = coordinate['latitude'] - current_latitude
+            orientation_angle = np.arctan2(dy, dx)
+            dTheta = scale_angle(orientation_angle - current_orientation_angle)   
+            
+            if dTheta > 0:
+                directions.append("Left")
+            elif dTheta < 0:
+                directions.append("Right")
+            
+            directions.append("Straight")
+            
+            #Update Drone Orientation
+            r.hset('drone_orientation', 'longitude', coordinate['longitude'])
+            r.hset('drone_orientation', 'latitude', coordinate['latitude'])
+            r.hset('drone_orientation', 'orientation_angle', orientation_angle)
+            current_longitude = coordinate['longitude']
+            current_latitude = coordinate['latitude']
+            current_orientation_angle = orientation_angle
+                        
+        #Return GPS Coordinate of Next Point on Path
+        return json.dumps({"commands": directions})
 ################################# 
 
 #Run Flask Application
