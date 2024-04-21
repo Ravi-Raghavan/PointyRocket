@@ -113,11 +113,11 @@ def get_traveling_salesman_path():
             dTheta = scale_angle(orientation_angle - current_orientation_angle)   
             
             if dTheta > 0:
-                directions.append("Left")
+                directions.append(2)
             elif dTheta < 0:
-                directions.append("Right")
+                directions.append(1)
             
-            directions.append("Straight")
+            directions.append(0)
             
             #Update Drone Orientation
             r.hset('drone_orientation', 'longitude', coordinate[0])
@@ -126,7 +126,8 @@ def get_traveling_salesman_path():
             current_longitude = coordinate[0]
             current_latitude = coordinate[1]
             current_orientation_angle = orientation_angle
-                        
+        
+        directions.append(4)                
         #Return GPS Coordinate of Next Point on Path
         return json.dumps({"commands": directions})
 #################################
@@ -293,11 +294,11 @@ def get_path():
             dTheta = scale_angle(orientation_angle - current_orientation_angle)   
             
             if dTheta > 0:
-                directions.append("Left")
+                directions.append(2)
             elif dTheta < 0:
-                directions.append("Right")
+                directions.append(1)
             
-            directions.append("Straight")
+            directions.append(0)
             
             #Update Drone Orientation
             r.hset('drone_orientation', 'longitude', coordinate['longitude'])
@@ -306,7 +307,9 @@ def get_path():
             current_longitude = coordinate['longitude']
             current_latitude = coordinate['latitude']
             current_orientation_angle = orientation_angle
-                        
+        
+        directions.append(4)
+                     
         #Return GPS Coordinate of Next Point on Path
         return json.dumps({"commands": directions})
 ################################# 
