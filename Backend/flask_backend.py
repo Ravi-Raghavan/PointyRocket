@@ -73,6 +73,10 @@ def traveling_salesman():
         store_traveling_salesman_path(coordinates)
         return "Successfully Submitted"
 
+#Given an angle in radians, make sure it is from -pi to pi
+def scale_angle(theta):
+    return theta - (2 * np.pi * (np.floor((theta + np.pi) / (2 * np.pi))))
+
 #Load traveling salesman path from Redis
 def load_traveling_salesman_path():
     queue_name = 'traveling_salesman_queue'
@@ -89,19 +93,42 @@ def get_traveling_salesman_path():
         if (len(traveling_salesman_path) < 1):
             r.lpop('traveling_salesman_queue')
             return "YOU HAVE ALREADY FINSHED YOUR PATH"
+
+        #Current Drone Orientation
+        longitude = float(r.hget('drone_orientation', 'longitude').decode('utf-8'))
+        latitude = float(r.hget('drone_orientation', 'latitude').decode('utf-8'))
+        orientation_angle = float(r.hget('drone_orientation', 'orientation_angle').decode('utf-8'))
                         
-        #Next Drone Orientation
-        next_point = traveling_salesman_path[0]
-                
-        #Remove the "next point" from traveling salesman path
-        traveling_salesman_path = traveling_salesman_path[1: ]
-                
-        #Update Traveling Salesman Queue
-        queue_name = 'traveling_salesman_queue'
-        r.lset(queue_name, 0, json.dumps(traveling_salesman_path))
+        #Directions
+        directions = []
         
+        #Go through all coordinates in path and calculate directions
+        current_longitude = longitude
+        current_latitude = latitude
+        current_orientation_angle = orientation_angle
+        for coordinate in traveling_salesman_path:
+            dx = coordinate[0] - current_longitude
+            dy = coordinate[1] - current_latitude
+            orientation_angle = np.arctan2(dy, dx)
+            dTheta = scale_angle(orientation_angle - current_orientation_angle)   
+            
+            if dTheta > 0:
+                directions.append("Left")
+            elif dTheta < 0:
+                directions.append("Right")
+            
+            directions.append("Straight")
+            
+            #Update Drone Orientation
+            r.hset('drone_orientation', 'longitude', coordinate[0])
+            r.hset('drone_orientation', 'latitude', coordinate[1])
+            r.hset('drone_orientation', 'orientation_angle', orientation_angle)
+            current_longitude = coordinate[0]
+            current_latitude = coordinate[1]
+            current_orientation_angle = orientation_angle
+                        
         #Return GPS Coordinate of Next Point on Path
-        return json.dumps({'longitude': next_point[0], 'latitude': next_point[1]})
+        return json.dumps({"commands": directions})
 #################################
 
 #### Drone Orientation Data ####
