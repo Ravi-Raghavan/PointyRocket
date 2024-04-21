@@ -271,7 +271,10 @@ def load_path():
 @app.route("/get_path", methods = ["GET"])
 def get_path():
     if request.method == "GET":
-        path = load_path()['path']
+        try:
+            path = load_path()['path']
+        except:
+            json.dumps({"commands": [4]})
         
         #Current Drone Orientation
         longitude = float(r.hget('drone_orientation', 'longitude').decode('utf-8'))
