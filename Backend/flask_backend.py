@@ -89,10 +89,6 @@ def load_traveling_salesman_path():
 def get_traveling_salesman_path():
     if request.method == "GET":
         traveling_salesman_path = load_traveling_salesman_path()
-        
-        if (len(traveling_salesman_path) < 1):
-            r.lpop('traveling_salesman_queue')
-            return "YOU HAVE ALREADY FINSHED YOUR PATH"
 
         #Current Drone Orientation
         longitude = float(r.hget('drone_orientation', 'longitude').decode('utf-8'))
@@ -127,7 +123,9 @@ def get_traveling_salesman_path():
             current_latitude = coordinate[1]
             current_orientation_angle = orientation_angle
         
-        directions.append(4)                
+        directions.append(4) 
+        
+        r.lpop('traveling_salesman_queue')
         #Return GPS Coordinate of Next Point on Path
         return json.dumps({"commands": directions})
 #################################
@@ -269,7 +267,7 @@ def load_path():
     value = r.get('path')
     return json.loads(value)
 
-#Get Path Data from Drone
+#Get Path Data from Redis
 @app.route("/get_path", methods = ["GET"])
 def get_path():
     if request.method == "GET":
@@ -309,7 +307,8 @@ def get_path():
             current_orientation_angle = orientation_angle
         
         directions.append(4)
-                     
+        
+        r.delete('path')             
         #Return GPS Coordinate of Next Point on Path
         return json.dumps({"commands": directions})
 ################################# 
