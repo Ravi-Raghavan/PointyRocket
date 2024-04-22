@@ -51,6 +51,10 @@
     },
     "updates": {
       "url": "https://u.expo.dev/108e2f45-0d52-48b8-ba1e-e40c5a91e20e"
+    },
+    "packagerOpts": {
+      "hostType": "lan",
+      "lanType": "ip"
     }
   }
 }
