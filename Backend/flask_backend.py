@@ -71,7 +71,7 @@ def traveling_salesman():
         
         #Store Traveling Salesman Path in Redis
         store_traveling_salesman_path(coordinates)
-        return "Successfully Submitted"
+        return json.dumps({'coordinates': coordinates})
 
 #Given an angle in radians, make sure it is from -pi to pi
 def scale_angle(theta):
