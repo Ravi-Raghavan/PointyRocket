@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import * as Location from 'expo-location';
 import Modal from "react-native-modal";
 import { GestureHandlerRootView, PanGestureHandler, State } from 'react-native-gesture-handler';
+import { ScreenOrientation } from 'expo';
 
 
 //  colors
@@ -25,7 +26,9 @@ const load_url = 'https://factual-moved-snapper.ngrok-free.app/load_paths';
 let startX;
 
 
+
 export default function App() {
+  
 
   // boolean to add pin on map
   const [addPin, setAddPin] = useState(false);
@@ -84,7 +87,6 @@ export default function App() {
   // adds new laoded path on the map
   const newPathObject = (obj) => {
     setNewPath(obj);
-    console.log('Test');
   }
 
   // fetch data from mongoDB to extract saved paths
@@ -92,14 +94,20 @@ export default function App() {
     if(closePopUp) {
       try {
         const response = await fetch(load_url);
+
         if (!response.ok) {
           throw new Error('COULD NOT FIND THE URL');
           
         } 
         else {
           const data = await response.json();
-          setSavedPath(data);
-          // console.log('TESTING: structure of data loaded', JSON.stringify(data));
+          
+          if (data.length > 0) {
+            setSavedPath(data);
+            // console.log('TESTING: structure of data loaded', JSON.stringify(data));
+          } else {
+            console.info('WARNING: No saved paths found');
+          }
         };
         
       } catch (error) {
@@ -218,27 +226,26 @@ export default function App() {
 
                 {savedPath && savedPath.map((item, index) => (
 
-                  <TouchableOpacity onPress={() => newPathObject(item)} key={item.name} onLongPress={() => { showAlert(item) }}>
+                  <TouchableOpacity onPress={() => newPathObject(item)} key={item.name}>
                     <View style={{ backgroundColor: primaryCol, padding: 8, borderRadius: 10, marginBottom: 8 }} >
 
                       <View style={{ justifyContent: 'space-between', flexDirection: 'row', alignItems: 'center' }}>
                         <Text style={{ fontSize: 24, color: accent }}>{item.name} </Text>
 
 
-                        <View style={{ height: '100%', width: 20 }}>
+                        <TouchableOpacity style={{ height: '100%', width: 40, alignItems: 'center' }} onPress={() => { showAlert(item) }}>
                           <Image
                             source={require(delete_path)}
                             style={{ height: 16, width: 16, marginRight: 2 }}
                           ></Image>
-                        </View>
+                        </TouchableOpacity>
                       </View>
 
                       <Text style={{ fontSize: 14, color: accent }}>Center Coordinate: ({item.center.latitude}, {item.center.longitude})</Text>
-                      <Text style={{ fontSize: 14, color: accent }}>Start Coordinate: ({item.route[0].latitude}, {item.route[0].longitude})</Text>
-                      <Text style={{ fontSize: 14, color: accent }}>End Coordinate: ({item.route[item.route.length - 1].latitude}, {item.route[item.route.length - 1].longitude})</Text>
+                      <Text style={{ fontSize: 14, color: accent }}>Start Coordinate: ({item.path[0].latitude}, {item.path[0].longitude})</Text>
+                      <Text style={{ fontSize: 14, color: accent }}>End Coordinate: ({item.path[item.path.length - 1].latitude}, {item.path[item.path.length - 1].longitude})</Text>
                     </View>
                   </TouchableOpacity>
-
                 ))}
 
 
@@ -332,8 +339,8 @@ const styles = StyleSheet.create({
 
   searchBox: {
     backgroundColor: primaryCol,
-    // height: '12%',
-    flex: 1,
+    height: '8%',
+    // flex: 1,
     flexDirection: 'row',
     paddingTop: 16,
     paddingHorizontal: 8,
@@ -355,16 +362,16 @@ const styles = StyleSheet.create({
 
   mapBox: {
     backgroundColor: secondaryCol,
-    // height: '68%',
-    flex: 8 
+    height: '76%',
+    // flex: 8 
   },
 
 
 
   btnBox: {
     backgroundColor: secondaryCol,
-    // height: '10%',
-    flex: 3,
+    height: '16%',
+    // flex: 1,
     justifyContent: 'center',
     flexDirection: 'column',
     alignItems: 'center',

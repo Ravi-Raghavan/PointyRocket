@@ -19,7 +19,7 @@ const subLineCol = 'white'//'#005B41'; // line color when submit clicked
 
 const ipAddressDraw = 'https://factual-moved-snapper.ngrok-free.app/submit_path';
 const ipAddressRoute = 'https://factual-moved-snapper.ngrok-free.app/traveling_salesman';
-const ipAddressSave = 'https://factual-moved-snapper.ngrok-free.app/save_data';
+const ipAddressSave = 'https://factual-moved-snapper.ngrok-free.app/save_path';
 
 const routerRange = 100 // meters
 
@@ -29,6 +29,11 @@ const origin = '../assets/start.png';
 const router = '../assets/router.png'; // 64px
 const cancel = '../assets/cancel.png';
 const checkmark = '../assets/destinations.png';
+const magnifier = '../assets/magnifier.png';
+const pen = '../assets/pen.png';
+const terrain = '../assets/terrain.png';
+const satellite = '../assets/satellite.png';
+const eye = '../assets/eye.png';
 
 export default function GoogleMap({ userLocation,
     marker, setMarker,
@@ -93,6 +98,7 @@ export default function GoogleMap({ userLocation,
 
     // TODO chnages map vew type
     const changeMapType = () => {
+        console.log(mapType)
         switch (mapType) {
             case 'standard':
                 setMapType('satellite');
@@ -198,8 +204,8 @@ export default function GoogleMap({ userLocation,
         if(newPath){
 
             
-            setMarker(newPath.center);
-            setPolylinePath(newPath.route);
+            // setMarker(newPath.center);
+            // setPolylinePath(newPath.route);
             focusMarker();
             setNewPath(null); // retuns to default state - empty
         }
@@ -212,7 +218,9 @@ export default function GoogleMap({ userLocation,
 
         // drawn path to backend
         if (submit && polylinePath){
-            const data = { center: marker ,route : polylinePath };
+
+            const data = { center: marker,
+                path : polylinePath };
             
             try {
                 fetch(ipAddressDraw, {
@@ -238,7 +246,10 @@ export default function GoogleMap({ userLocation,
 
         // travel salesman markers to backend
         else if ( isRoute && startLocation && destinations) {
-            const data = { center: marker, startPoint: startLocation, stops: destinations };
+
+            const data = { center: marker, 
+                startPoint: startLocation, 
+                stops: destinations };
         
             try {
                 fetch(ipAddressRoute, {
@@ -268,15 +279,14 @@ export default function GoogleMap({ userLocation,
             const data = {
                 name: inputValue,
                 center: marker,
-                route: polylinePath
+                path: polylinePath
             }
 
             // closes pop up box
             isToSave(false);
             setInputValue(''); // CLEARS input
 
-            console.log('data that is saved', data.name);
-            console.log('length of path', data.route.length);
+            console.table('TESTING: path name', data.name);
           
             try {     
                 fetch(ipAddressSave, {
@@ -353,11 +363,34 @@ export default function GoogleMap({ userLocation,
 
                 
                 <Text style={styles.featureItem}> Distance </Text>
-                <Text style={styles.featureItem}> Color </Text>
+
+                <TouchableOpacity  style={styles.topFrame}>
+                    <Image source={require(pen)}
+                        style={styles.topBtn} />
+                    <Text style={styles.featureItem}> Color </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.topFrame} onPress={changeMapType}>
+                    <Image source={mapType === 'standard' ? require(terrain) : require(satellite)}
+                        style={styles.topBtn} />
+                    <Text style={styles.featureItem}> {mapType.charAt(0).toUpperCase() + mapType.slice(1)} </Text>
+                </TouchableOpacity>
                 
-                <Text style={styles.featureItem} onPress={changeMapType}> {mapType.charAt(0).toUpperCase() + mapType.slice(1)} </Text>
-                <Text style={styles.featureItem} onPress={focusMarker}> Map Focus </Text>
-                <Text style={styles.featureItem} onPress={focusUser} > My Location </Text>
+
+                <TouchableOpacity style={styles.topFrame} onPress={changeMapType}>
+                    <Image source={mapType === 'standard' ? require(terrain) : require(satellite)}
+                        style={styles.topBtn} />
+                    <Text style={styles.featureItem} onPress={focusMarker}> Map Focus </Text>
+                </TouchableOpacity>
+                
+                
+                
+                <TouchableOpacity onPress={focusUser} style={styles.topFrame}>
+                        <Image source={require(magnifier)}
+                            style={styles.topBtn} />
+                        <Text style={styles.featureItem}> My Location</Text>
+                </TouchableOpacity>
+             
                 
 
             </View>
@@ -474,12 +507,22 @@ const styles = StyleSheet.create({
 
     featureItem: {
         color: 'white',
+        fontSize: 20,
         
     },
 
     map: {
         width: '100%',
         height: '92%',
+    },
+
+    topFrame: {
+        flexDirection: 'row',
+        alignItems: 'center'
+    },
+    topBtn: {
+        height: 20,
+        width: 20,
     },
 });
 

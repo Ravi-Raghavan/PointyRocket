@@ -101,7 +101,7 @@ const ButtonLayout = ({ marker, addPin, setAddPin, setRemovePin, drawPath, setDr
     return (
         <>
         
-            <View style={[btnStyle.btnLayer, { flexWrap: 'wrap' }]} >
+            <View style={btnStyle.btnLayer} >
 
                 <View style={[btnStyle.btnFrame, drawPath  ? btnStyle.inactive : null]} >
 
@@ -311,26 +311,25 @@ const btnStyle  = StyleSheet.create({
     },
 
     inactive: {
-        opacity: 0.5,
+        opacity: 0.2,
         backgroundColor: secondaryCol,
     },
 
 
     btnLayer: {
         width: '100%',
-        // height: '100%',
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
+        flexWrap: 'wrap',
 
     },
 
     btnFrame: {
         justifyContent: 'center',
-        // marginHorizontal: 10,
-        marginRight: 10,
+        // marginRight: 10,
         alignItems: 'center',
-        marginTop: 15,
+        width: 75,
         
     },
 
@@ -351,9 +350,9 @@ const btnStyle  = StyleSheet.create({
         backgroundColor: alert
     },
 
-    image: { height: 30, width: 30 },
+    image: { height: 40, width: 40 },
 
-    text: {fontSize:10},
+    text: {fontSize:14},
 
     textContainer: {
         paddingVertical: 2  , // Adjust padding as needed
