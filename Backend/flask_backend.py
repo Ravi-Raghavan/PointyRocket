@@ -296,8 +296,19 @@ def get_path():
         current_latitude = latitude
         current_orientation_angle = orientation_angle
         for coordinate in path:
-            dx = coordinate['longitude'] - current_longitude
-            dy = coordinate['latitude'] - current_latitude
+            newLong = None
+            newLat = None
+            
+            try:
+                newLong = coordinate['longitude']
+                newLat = coordinate['latitude']
+            except:
+                newLong = coordinate[0]
+                newLat = coordinate[1]
+                
+            dx = newLong - current_longitude
+            dy = newLat - current_latitude
+            
             orientation_angle = np.arctan2(dy, dx)
             dTheta = scale_angle(orientation_angle - current_orientation_angle)   
             
@@ -311,11 +322,12 @@ def get_path():
             directions.append(3)
             
             #Update Drone Orientation
-            r.hset('drone_orientation', 'longitude', coordinate['longitude'])
-            r.hset('drone_orientation', 'latitude', coordinate['latitude'])
+            r.hset('drone_orientation', 'longitude', newLong)
+            r.hset('drone_orientation', 'latitude', newLat)
             r.hset('drone_orientation', 'orientation_angle', orientation_angle)
-            current_longitude = coordinate['longitude']
-            current_latitude = coordinate['latitude']
+            
+            current_longitude = newLong
+            current_latitude = newLat
             current_orientation_angle = orientation_angle
         
         directions.append(0)
