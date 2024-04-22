@@ -281,7 +281,7 @@ def get_path():
         try:
             path = load_path()['path']
         except:
-            return json.dumps({"commands": [4]})
+            return json.dumps({"commands": [0]})
         
         #Current Drone Orientation
         longitude = float(r.hget('drone_orientation', 'longitude').decode('utf-8'))
