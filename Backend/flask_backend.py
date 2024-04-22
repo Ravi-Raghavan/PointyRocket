@@ -37,6 +37,7 @@ def store_traveling_salesman_path(path):
 def traveling_salesman():
     if request.method == "POST":
         data = request.get_json()
+        print(data)
         
         #Initialize dictionary with Starting Point
         nodes = {}
@@ -68,6 +69,8 @@ def traveling_salesman():
         index = shortest_path.index(starting_node)
         shortest_path = shortest_path[index:] + shortest_path[:index]
         coordinates =  [nodes[point] for point in shortest_path]
+        
+        print(coordinates)
         
         #Store Traveling Salesman Path in Redis
         store_traveling_salesman_path(coordinates)
