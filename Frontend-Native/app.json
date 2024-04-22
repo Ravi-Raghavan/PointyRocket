@@ -1,8 +1,8 @@
 {
   "expo": {
-    "owner": "captin101",
+    "owner": "pointy-rocket",
     "name": "Frontend-Native",
-    "slug": "Frontend-Native",
+    "slug": "capstone",
     "version": "1.0.0",
     "jsEngine": "jsc",
     "orientation": "portrait",
@@ -43,7 +43,7 @@
     },
     "extra": {
       "eas": {
-        "projectId": "108e2f45-0d52-48b8-ba1e-e40c5a91e20e"
+        "projectId": "37d56b02-6390-4075-b613-5b14f5c95575"
       }
     },
     "runtimeVersion": {
