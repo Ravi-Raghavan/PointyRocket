@@ -37,13 +37,14 @@ def store_traveling_salesman_path(path):
 def traveling_salesman():
     if request.method == "POST":
         data = request.get_json()
+        print(data)
         
         #Initialize dictionary with Starting Point
         nodes = {}
         nodes['startPoint'] = (data['startPoint']['latitude'], data['startPoint']['longitude'])    
         
         #Add destination points to graph
-        for index, destination in enumerate(data['destinations']):
+        for index, destination in enumerate(data['stops']):
             nodes[f'destination_{index}'] = (destination['latitude'], destination['longitude'])   
             
         # Specify the starting point
@@ -69,9 +70,11 @@ def traveling_salesman():
         shortest_path = shortest_path[index:] + shortest_path[:index]
         coordinates =  [nodes[point] for point in shortest_path]
         
+        print(coordinates)
+        
         #Store Traveling Salesman Path in Redis
         store_traveling_salesman_path(coordinates)
-        return "Successfully Submitted"
+        return json.dumps({'coordinates': coordinates})
 
 #Given an angle in radians, make sure it is from -pi to pi
 def scale_angle(theta):
