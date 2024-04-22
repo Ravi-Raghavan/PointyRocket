@@ -182,15 +182,18 @@ export default function App() {
     } else if (event.nativeEvent.state === State.END) {
       const endX = event.nativeEvent.translationX;
 
-      // right swip
+      // left swip
       if (endX - startX < -100) {
-        console.log('Swipe to the right detected!');
+        savedPath.sort((a, b) => b.name.localeCompare(a.name)); //desc
+        console.log('Swipe to the left detected!');
+
         
       }
 
-      // left swip
+      // right swip
       else if (endX - startX > 100 ) {
-        console.log('Swipe to the left detected!');
+        savedPath.sort((a, b) => a.name.localeCompare(b.name)); //asec
+        console.log('Swipe to the right detected!');
       };
     }
   };
@@ -206,51 +209,61 @@ export default function App() {
           <PanGestureHandler
             onHandlerStateChange={onHandlerStateChange}
           >
-            <View style={{ backgroundColor: secondaryCol, width: '90%', height: '70%', padding: 16, borderRadius: '20%' }}>
+            
+            
+            <View style={{width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', flexDirection: 'col'}}>
 
+              <View style={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'row', marginBottom: 20 }} >
+                <Text style={{color: 'white', fontSize: 20, marginHorizontal: 20}}>Swipe Left for Descending Order</Text>
 
-              {/* title and cross button */}
-              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                <Text style={{ fontSize: 30, color: primaryCol }}>Select Path to Load</Text>
-                <TouchableOpacity onPress={() => { setClosePopUp(false) }}>
-                  <Image
-                    source={require(cancel)}
-                    style={{ height: 30, width: 30 }}
-                  ></Image>
-                </TouchableOpacity>
+                <Text style={{ color: 'white', fontSize: 20, marginHorizontal: 20 }}>Swipe Right for Ascending Order</Text>
               </View>
 
-              {/* layout for a path */}
+              <View style={{ backgroundColor: secondaryCol, width: '90%', height: '70%', padding: 16, borderRadius: '20%' }}>
 
-              <ScrollView>
-
-                {savedPath && savedPath.map((item, index) => (
-
-                  <TouchableOpacity onPress={() => newPathObject(item)} key={item.name}>
-                    <View style={{ backgroundColor: primaryCol, padding: 8, borderRadius: 10, marginBottom: 8 }} >
-
-                      <View style={{ justifyContent: 'space-between', flexDirection: 'row', alignItems: 'center' }}>
-                        <Text style={{ fontSize: 24, color: accent }}>{item.name} </Text>
-
-
-                        <TouchableOpacity style={{ height: '100%', width: 40, alignItems: 'center' }} onPress={() => { showAlert(item) }}>
-                          <Image
-                            source={require(delete_path)}
-                            style={{ height: 16, width: 16, marginRight: 2 }}
-                          ></Image>
-                        </TouchableOpacity>
-                      </View>
-
-                      <Text style={{ fontSize: 14, color: accent }}>Center Coordinate: ({item.center.latitude}, {item.center.longitude})</Text>
-                      <Text style={{ fontSize: 14, color: accent }}>Start Coordinate: ({item.path[0].latitude}, {item.path[0].longitude})</Text>
-                      <Text style={{ fontSize: 14, color: accent }}>End Coordinate: ({item.path[item.path.length - 1].latitude}, {item.path[item.path.length - 1].longitude})</Text>
-                    </View>
+                {/* title and cross button */}
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                  <Text style={{ fontSize: 30, color: primaryCol }}>Select Path to Load</Text>
+                  <TouchableOpacity onPress={() => { setClosePopUp(false) }}>
+                    <Image
+                      source={require(cancel)}
+                      style={{ height: 30, width: 30 }}
+                    ></Image>
                   </TouchableOpacity>
-                ))}
+                </View>
+
+                {/* layout for a path */}
+
+                <ScrollView>
+
+                  {savedPath && savedPath.map((item, index) => (
+
+                    <TouchableOpacity onPress={() => newPathObject(item)} key={item.name}>
+                      <View style={{ backgroundColor: primaryCol, padding: 8, borderRadius: 10, marginBottom: 8 }} >
+
+                        <View style={{ justifyContent: 'space-between', flexDirection: 'row', alignItems: 'center' }}>
+                          <Text style={{ fontSize: 24, color: accent }}>{item.name} </Text>
+
+
+                          <TouchableOpacity style={{ height: '100%', width: 40, alignItems: 'center' }} onPress={() => { showAlert(item) }}>
+                            <Image
+                              source={require(delete_path)}
+                              style={{ height: 16, width: 16, marginRight: 2 }}
+                            ></Image>
+                          </TouchableOpacity>
+                        </View>
+
+                        <Text style={{ fontSize: 14, color: accent }}>Center Coordinate: ({item.center.latitude}, {item.center.longitude})</Text>
+                        <Text style={{ fontSize: 14, color: accent }}>Start Coordinate: ({item.path[0].latitude}, {item.path[0].longitude})</Text>
+                        <Text style={{ fontSize: 14, color: accent }}>End Coordinate: ({item.path[item.path.length - 1].latitude}, {item.path[item.path.length - 1].longitude})</Text>
+                      </View>
+                    </TouchableOpacity>
+                  ))}
 
 
 
-              </ScrollView>
+                </ScrollView>
+              </View>
             </View>
           </PanGestureHandler>
         </Modal>

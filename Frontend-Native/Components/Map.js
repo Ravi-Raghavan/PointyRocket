@@ -4,6 +4,7 @@ import { Text, StyleSheet, View, TouchableOpacity, Image, TextInput, Pressable }
 import Modal from "react-native-modal";
 
 
+
 // initial region when map laods
 const initialRegion = {
     latitude: 48.8584,
@@ -233,7 +234,8 @@ export default function GoogleMap({ userLocation,
                 })
 
                 console.assert('Data is sent');
-                setdefaultLineCol(subLineCol);
+
+            
             }
             catch (error){
                 console.error('An error occurred during drawing submission:', error.message);
@@ -378,7 +380,7 @@ export default function GoogleMap({ userLocation,
                 
 
                 <TouchableOpacity style={styles.topFrame} onPress={changeMapType}>
-                    <Image source={mapType === 'standard' ? require(terrain) : require(satellite)}
+                    <Image source={require(eye)}
                         style={styles.topBtn} />
                     <Text style={styles.featureItem} onPress={focusMarker}> Map Focus </Text>
                 </TouchableOpacity>
@@ -526,3 +528,7 @@ const styles = StyleSheet.create({
     },
 });
 
+// Sleep function
+const sleep = (milliseconds) => {
+    return new Promise(resolve => setTimeout(resolve, milliseconds));
+}
