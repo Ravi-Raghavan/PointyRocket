@@ -35,6 +35,7 @@ const pen = '../assets/pen.png';
 const terrain = '../assets/terrain.png';
 const satellite = '../assets/satellite.png';
 const eye = '../assets/eye.png';
+const drone = '../assets/drone.png';
 
 export default function GoogleMap({ userLocation,
     marker, setMarker,
@@ -81,6 +82,9 @@ export default function GoogleMap({ userLocation,
 
     // travelsalesman path
     const [travelSalesmanPath, setTravelSalesmanPath] = useState([]);
+
+    // drone coordinate
+    const [droneLocation, setDroneLocation] = useState(null);
 
     // TODO focus map to user locaiton
     const focusUser = () => {
@@ -212,6 +216,8 @@ export default function GoogleMap({ userLocation,
             setDeletePath(false);
             setDrawn(false);
             setDistance(0.00);
+
+            setDroneLocation(null);
         }
     };
 
@@ -261,6 +267,21 @@ export default function GoogleMap({ userLocation,
 
             
             isSubmit(false);
+            // setDroneLocation(polylinePath[0]);
+            // console.log(droneLocation);
+
+            // drone moving according to the path
+            let i = 0;
+            const interval = setInterval(() => {
+                if (i < polylinePath.length) {
+                    setDroneLocation(polylinePath[i]);
+                    console.log(polylinePath[i]);
+                    console.log(droneLocation); // Assuming droneLocation is updated inside setDroneLocation
+                    i++;
+                } else {
+                    clearInterval(interval);
+                }
+            }, 500); // Adjust the interval here (e.g., 1000 milliseconds = 1 second)
 
         } 
 
@@ -497,6 +518,14 @@ export default function GoogleMap({ userLocation,
                             image={require(router)}
                             style = {{opacity: 1}}
                         />
+
+                        {droneLocation && (
+                            <Marker
+                                coordinate={droneLocation}
+                                image={require(drone)}
+                                style={{ opacity: 1 }}
+                            />
+                       )}
 
                         {startLocation && (
                             <Marker
