@@ -27,10 +27,10 @@ r = redis.Redis(
 
 #### Traveling Salesman Code ####
 #Helper Function to Store Traveling Salesman Path in Redis
-def store_traveling_salesman_path(path):
-    queue_name = 'traveling_salesman_queue'
-    path = json.dumps(path)
-    r.rpush(queue_name, path)
+def store_traveling_salesman_path(coordinates):
+    # Store Data in Redis
+    path_data = json.dumps({'path': coordinates})
+    r.set(f"path", path_data)
 
 #Solve Traveling Salesman Problem and Store Path in Redis
 @app.route("/traveling_salesman", methods = ["POST"])
@@ -82,16 +82,14 @@ def scale_angle(theta):
 
 #Load traveling salesman path from Redis
 def load_traveling_salesman_path():
-    queue_name = 'traveling_salesman_queue'
-    front_item = r.lindex(queue_name, 0)
-    front_item = json.loads(front_item)
-    return front_item
+    value = r.get('path')
+    return json.loads(value)
 
 #Get Traveling Salesman Path
 @app.route("/get_traveling_salesman_path", methods = ["GET"])
 def get_traveling_salesman_path():
     if request.method == "GET":
-        traveling_salesman_path = load_traveling_salesman_path()
+        traveling_salesman_path = load_traveling_salesman_path()['path']
 
         #Current Drone Orientation
         longitude = float(r.hget('drone_orientation', 'longitude').decode('utf-8'))
