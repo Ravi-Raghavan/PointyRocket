@@ -100,7 +100,7 @@ def get_traveling_salesman_path():
                         
         #Directions
         directions = []
-        directions.append(4)
+        directions.append(0)
         directions.append(3)
         
         #Go through all coordinates in path and calculate directions
@@ -119,7 +119,7 @@ def get_traveling_salesman_path():
                 directions.append(1)
             directions.append(3)
             
-            directions.append(0)
+            directions.append(4)
             directions.append(3)
             
             #Update Drone Orientation
@@ -130,7 +130,7 @@ def get_traveling_salesman_path():
             current_latitude = coordinate[1]
             current_orientation_angle = orientation_angle
         
-        directions.append(4) 
+        directions.append(0) 
         
         r.lpop('traveling_salesman_queue')
         #Return GPS Coordinate of Next Point on Path
@@ -290,7 +290,7 @@ def get_path():
                         
         #Directions
         directions = []
-        directions.append(4)
+        directions.append(0)
         directions.append(3)
         
         #Go through all coordinates in path and calculate directions
@@ -309,7 +309,7 @@ def get_path():
                 directions.append(1)
             directions.append(3)
             
-            directions.append(0)
+            directions.append(4)
             directions.append(3)
             
             #Update Drone Orientation
@@ -320,7 +320,7 @@ def get_path():
             current_latitude = coordinate['latitude']
             current_orientation_angle = orientation_angle
         
-        directions.append(4)
+        directions.append(0)
         
         r.delete('path')             
         #Return GPS Coordinate of Next Point on Path
