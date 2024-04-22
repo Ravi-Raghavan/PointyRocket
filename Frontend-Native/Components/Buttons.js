@@ -311,7 +311,7 @@ const btnStyle  = StyleSheet.create({
     },
 
     inactive: {
-        opacity: 0.2,
+        opacity: 0.5,
         backgroundColor: secondaryCol,
     },
 
@@ -319,9 +319,11 @@ const btnStyle  = StyleSheet.create({
     btnLayer: {
         width: '100%',
         flexDirection: 'row',
-        justifyContent: 'center',
+        justifyContent: 'space-between',
         alignItems: 'center',
         flexWrap: 'wrap',
+        paddingHorizontal: 10,
+        paddingVertical: 32,
 
     },
 
@@ -352,7 +354,9 @@ const btnStyle  = StyleSheet.create({
 
     image: { height: 40, width: 40 },
 
-    text: {fontSize:14},
+    text: {fontSize:14,
+        color: 'white',
+        },
 
     textContainer: {
         paddingVertical: 2  , // Adjust padding as needed

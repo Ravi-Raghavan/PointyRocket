@@ -6,7 +6,6 @@ import { useEffect, useState } from 'react';
 import * as Location from 'expo-location';
 import Modal from "react-native-modal";
 import { GestureHandlerRootView, PanGestureHandler, State } from 'react-native-gesture-handler';
-import { ScreenOrientation } from 'expo';
 
 
 //  colors
@@ -356,7 +355,7 @@ const styles = StyleSheet.create({
     // flex: 1,
     flexDirection: 'row',
     paddingTop: 16,
-    paddingHorizontal: 8,
+    paddingHorizontal: 32,
     justifyContent: 'space-between',
     alignItems: 'center'
 
@@ -376,6 +375,7 @@ const styles = StyleSheet.create({
   mapBox: {
     backgroundColor: secondaryCol,
     height: '76%',
+    
     // flex: 8 
   },
 
@@ -384,7 +384,7 @@ const styles = StyleSheet.create({
   btnBox: {
     backgroundColor: secondaryCol,
     height: '16%',
-    // flex: 1,
+    // opacity: 0.9,
     justifyContent: 'center',
     flexDirection: 'column',
     alignItems: 'center',

@@ -76,6 +76,12 @@ export default function GoogleMap({ userLocation,
     // line color changes when drawn path is submitted
     const [defaultLineCol, setdefaultLineCol] = useState(primaryCol);
 
+    // distance drone will travel
+    const [distance, setDistance] = useState(0.00);
+
+    // travelsalesman path
+    const [travelSalesmanPath, setTravelSalesmanPath] = useState([]);
+
     // TODO focus map to user locaiton
     const focusUser = () => {
         if (userLocation) {
@@ -170,6 +176,7 @@ export default function GoogleMap({ userLocation,
                 setDestinations([]);
                 setStopsAdded(false);
                 setDeleteTravelSalesman(false);
+                setTravelSalesmanPath([]);
             
         };    
     };
@@ -181,6 +188,15 @@ export default function GoogleMap({ userLocation,
         const { coordinate } = event.nativeEvent;
         if (marker && isPointInsideCircle(coordinate, marker, routerRange)) {
             // console.log("locaiton", coordinate);
+
+            if (polylinePath.length > 0) {
+                const last_index = polylinePath.length - 1
+                const dist = calculateDistance(polylinePath[last_index].latitude, polylinePath[last_index].longitude, coordinate.latitude, coordinate.longitude);
+                
+                setDistance(distance + dist);
+            }
+
+
             setPolylinePath([...polylinePath, coordinate]);
 
             // console.log(polylinePath);
@@ -195,6 +211,7 @@ export default function GoogleMap({ userLocation,
             setPolylinePath([]);
             setDeletePath(false);
             setDrawn(false);
+            setDistance(0.00);
         }
     };
 
@@ -205,9 +222,10 @@ export default function GoogleMap({ userLocation,
         if(newPath){
 
             
-            // setMarker(newPath.center);
-            // setPolylinePath(newPath.route);
+            setMarker(newPath.center);
+            setPolylinePath(newPath.path);
             focusMarker();
+            setDrawn(true);
             setNewPath(null); // retuns to default state - empty
         }
     };
@@ -215,7 +233,7 @@ export default function GoogleMap({ userLocation,
     
     // * when submitting file
     // submits either drawn path or travel salesman markers
-    const submitPath = () => {
+    const submitPath = async () => {
 
         // drawn path to backend
         if (submit && polylinePath){
@@ -254,15 +272,38 @@ export default function GoogleMap({ userLocation,
                 stops: destinations };
         
             try {
-                fetch(ipAddressRoute, {
-                    method: 'POST',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(data)
-                })
-                console.log('Data is sent');
+
+                try {
+                    fetch(ipAddressRoute, {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(data)
+                    })
+                        .then(response => response.json())
+                        .then(responseData => {
+
+                            const calPath = responseData.coordinates.slice(0, -1);
+                            
+                            for (let i = 0; i < calPath.length; i++) {
+                                const newPoint = {latitude: calPath[i][0], longitude: calPath[i][1]}
+                                setTravelSalesmanPath(prevPath => [...prevPath, newPoint]);
+                                
+                            }
+                            
+                            
+                            // setTravelSalesmanPath();
+                        })
+                        .catch(error => {
+                            // Handle errors here
+                            console.error('There was a problem with the fetch operation:', error);
+                        });
+                }
+                catch (error) {
+                    console.error('An error occurred during travel salesman submission:', error.message);
+                }
             }
             catch (error) {
                 console.error('An error occurred during travel salesman submission:', error.message);
@@ -364,30 +405,34 @@ export default function GoogleMap({ userLocation,
             <View style={styles.features}>
 
                 
-                <Text style={styles.featureItem}> Distance </Text>
+                <TouchableOpacity style={styles.topFrame}>
+                    
+                    <Text style={styles.featureItem}> {distance.toFixed(2)}m Distance</Text>
+                </TouchableOpacity>
+                
 
                 <TouchableOpacity  style={styles.topFrame}>
                     <Image source={require(pen)}
                         style={styles.topBtn} />
-                    <Text style={styles.featureItem}> Color </Text>
+                    <Text style={styles.featureItem}> Color</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity style={styles.topFrame} onPress={changeMapType}>
                     <Image source={mapType === 'standard' ? require(terrain) : require(satellite)}
                         style={styles.topBtn} />
-                    <Text style={styles.featureItem}> {mapType.charAt(0).toUpperCase() + mapType.slice(1)} </Text>
+                    <Text style={styles.featureItem}> {mapType.charAt(0).toUpperCase() + mapType.slice(1)}</Text>
                 </TouchableOpacity>
                 
 
                 <TouchableOpacity style={styles.topFrame} onPress={changeMapType}>
                     <Image source={require(eye)}
                         style={styles.topBtn} />
-                    <Text style={styles.featureItem} onPress={focusMarker}> Map Focus </Text>
+                    <Text style={styles.featureItem} onPress={focusMarker}> Map Focus</Text>
                 </TouchableOpacity>
                 
                 
                 
-                <TouchableOpacity onPress={focusUser} style={styles.topFrame}>
+                <TouchableOpacity onPress={focusUser} style={styles.topFrame} >
                         <Image source={require(magnifier)}
                             style={styles.topBtn} />
                         <Text style={styles.featureItem}> My Location</Text>
@@ -427,6 +472,15 @@ export default function GoogleMap({ userLocation,
                                 strokeColor={defaultLineCol}
                                 strokeWidth={1.5}
                                 
+                            />
+                        )}
+
+                        {travelSalesmanPath && (
+                            <Polyline
+                                coordinates={travelSalesmanPath}
+                                strokeColor={defaultLineCol}
+                                strokeWidth={1}
+
                             />
                         )}
 
@@ -502,9 +556,9 @@ const styles = StyleSheet.create({
         height: '8%',
         display: 'flex',
         flexDirection: 'row',
-        justifyContent: 'space-around',
+        justifyContent: 'space-between',
         alignItems: 'center',
-        paddingHorizontal: 8,
+        paddingHorizontal: 32,
     },
 
     featureItem: {
@@ -520,15 +574,35 @@ const styles = StyleSheet.create({
 
     topFrame: {
         flexDirection: 'row',
-        alignItems: 'center'
+        // alignItems: 'center',
+        // width: '50%',
+        // backgroundColor: 'red'
     },
     topBtn: {
         height: 20,
         width: 20,
+        
     },
 });
 
-// Sleep function
-const sleep = (milliseconds) => {
-    return new Promise(resolve => setTimeout(resolve, milliseconds));
+const calculateDistance = (lat1, lon1, lat2, lon2) => {
+    const earthRadiusKm = 6371;
+
+    // Convert degrees to radians
+    const deg2rad = (degrees) => {
+        return degrees * (Math.PI / 180);
+    }
+
+    // Haversine formula
+    const dLat = deg2rad(lat2 - lat1);
+    const dLon = deg2rad(lon2 - lon1);
+    const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = earthRadiusKm * c;
+
+    return distance* 1000;
 }
+
