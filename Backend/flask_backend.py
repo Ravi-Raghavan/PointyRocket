@@ -97,6 +97,8 @@ def get_traveling_salesman_path():
                         
         #Directions
         directions = []
+        directions.append(4)
+        directions.append(3)
         
         #Go through all coordinates in path and calculate directions
         current_longitude = longitude
@@ -112,8 +114,10 @@ def get_traveling_salesman_path():
                 directions.append(2)
             elif dTheta < 0:
                 directions.append(1)
+            directions.append(3)
             
             directions.append(0)
+            directions.append(3)
             
             #Update Drone Orientation
             r.hset('drone_orientation', 'longitude', coordinate[0])
@@ -283,6 +287,7 @@ def get_path():
                         
         #Directions
         directions = []
+        directions.append(4)
         directions.append(3)
         
         #Go through all coordinates in path and calculate directions
