@@ -43,7 +43,7 @@ def traveling_salesman():
         nodes['startPoint'] = (data['startPoint']['latitude'], data['startPoint']['longitude'])    
         
         #Add destination points to graph
-        for index, destination in enumerate(data['destinations']):
+        for index, destination in enumerate(data['stops']):
             nodes[f'destination_{index}'] = (destination['latitude'], destination['longitude'])   
             
         # Specify the starting point
