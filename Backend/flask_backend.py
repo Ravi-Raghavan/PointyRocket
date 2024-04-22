@@ -283,6 +283,7 @@ def get_path():
                         
         #Directions
         directions = []
+        directions.append(4)
         directions.append(3)
         
         #Go through all coordinates in path and calculate directions
